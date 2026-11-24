@@ -1124,14 +1124,20 @@ if (typeof window !== "undefined") {
     if (!found) return [];
     var p = found.parent;
     var it = found.item;
-    /* 引用 hideDot 父级（如 15）→ 展开全部可见子点 */
-    if (!found.isCand && p.hideDot && p.candidates && p.candidates.length) {
-      return p.candidates
-        .filter(function (c) {
-          if (planExcludedIds()[c.id]) return false;
-          return !!state.catOn[effectiveCategory(p, c)];
-        })
-        .map(function (c) { return { parent: p, item: c, isCand: true }; });
+    /* 引用父级且有 candidates → 展开可见子点；hideDot 父级不单独占一行 */
+    if (!found.isCand && p.candidates && p.candidates.length) {
+      var out = [];
+      if (!p.hideDot) {
+        if (!planExcludedIds()[p.id] && state.catOn[effectiveCategory(p, p)]) {
+          out.push({ parent: p, item: p, isCand: false });
+        }
+      }
+      p.candidates.forEach(function (c) {
+        if (planExcludedIds()[c.id]) return;
+        if (!state.catOn[effectiveCategory(p, c)]) return;
+        out.push({ parent: p, item: c, isCand: true });
+      });
+      return out;
     }
     if (planExcludedIds()[it.id] || planExcludedIds()[p.id]) return [];
     if (!state.catOn[effectiveCategory(p, it)]) return [];
@@ -1190,6 +1196,10 @@ if (typeof window !== "undefined") {
       if (node.startTime) timeBits.push(node.startTime);
       if (node.endTime) timeBits.push(node.endTime);
       var timeStr = timeBits.length ? timeBits.join("–") : "";
+      /* 无起止钟点时展示预算停留时长（Day 1 预算清单） */
+      if (!timeStr && node.durationMinutes != null && node.durationMinutes !== "") {
+        timeStr = "预算 " + String(node.durationMinutes) + " 分钟";
+      }
       html += '<details class="list-acc plan-node" data-node="' + escapeHtml(node.id) + '"' + openAttr + ">";
       html += "<summary><span class=\"plan-node-title\">" + escapeHtml(node.title) + "</span>";
       if (timeStr) html += '<span class="acc-count">' + escapeHtml(timeStr) + "</span>";

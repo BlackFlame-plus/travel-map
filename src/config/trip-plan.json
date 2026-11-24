@@ -8,14 +8,15 @@
     "所有路线均为示意而非导航：geometry 为 null，routeKind 为 schematic。trip-plan 仍保留 segments 数据供日后重开；当前地图按用户反馈暂不绘制计划连线。每个线段说明列出两节点首个 primaryPlaceId 的 WGS84 球面直线距离，仅作最低距离筛查；道路/入口/海岸常需绕行，步行按舒适约 3 公里/小时并加缓冲。多数步行段 15–20 分钟，25 分钟的少数例外已明确；长段优先用车，车程含等车估算但不是交通实时数据。",
     "primaryPlaceIds 只代表默认计划；optionalPlaceIds 均为替换或减项后的备选，不参与任何默认 segment。多主点只放真正近邻，首项为地图路线锚，节点内部步行也占用节点时长。计划中无坐标的就近待选饭点、以及仅挂备选的替换节点不充当默认路线端点；Day 2 八大关直接连二浴跨过当地午餐，Day 3 默认有坐标主线仍在燕儿岛结束，Day 4 默认主线为小麦岛，饭点与替换节点均无虚构连线。",
     "陈记食集（10）已按用户要求排除，不在任何主选、备选和连线中；不改 places 主数据。",
-    "未对餐厅/咖啡做本轮实时营业核验，具体分店及地址来自已有 places，不把历史落点当成开门保证。晚饭必须先排正餐饭店，不能把酒馆当晚饭主选。Day 1 午晚饭有真实候选分店；Day 2–4 就近待选正餐（太平角结束点 / 香港中路·燕儿岛 / 东部海岸一带）不编造店名，也不把远处正餐店硬拉进步行节点。无坐标父条或待定位店绝不作主锚。",
-    "老杰克只保留香港中路店（13-hk65）一处，海天MALL店已从 places 删除。仅排在 Day 3 正餐晚饭之后的 optional（饭后可选酒馆，不作晚饭主选、全行程只去这一次）；用户截图写营业约 19:00–次日02:00、约¥118/人等，来自截图待核。Day 1 默认晚饭后结束；江苏路基督教堂、观象一路、观象二路仅挂在晚饭节点 optional，属饭后可选夜线、非必选；熹知酒馆仍不排入本计划。",
-    "画像预留 60–90 分钟现场确认，Day 1 默认画像加大学路街区，不再同时安排馆和山。信号山与小鱼山同属登山替换，彼此不叠加、也不与完整画像叠加；室内至多选择总督旧址一馆并削减画像至少 60 分钟，不能将可选列表当成同一时段全可完成。",
+    "未对餐厅/咖啡做本轮实时营业核验。Day 1 午饭候选 76-zhanqiao；Day 1 晚饭就近待选、不指定店名。Day 2–4 就近待选正餐不编造店名。无坐标父条或待定位店绝不作主锚。晚饭必须先正餐，不能把酒馆当晚饭主选。",
+    "老杰克只保留香港中路店（13-hk65）一处，海天MALL店已从 places 删除。仅排在 Day 3 正餐晚饭之后的 optional（饭后可选酒馆，不作晚饭主选、全行程只去这一次）；用户截图写营业约 19:00–次日02:00、约¥118/人等，来自截图待核。熹知酒馆仍不排入本计划。",
+    "Day 1 为用户 1–24 项顺序预算清单（从容逛时长），不用一天内时钟时刻表塞满；每节点只标 durationMinutes。教堂 16 / Bara 9 不进主线。晚饭待定、不写店名。开放时间一律行前核实。中山路 15 仅五子点；劈柴院 17 与巧克力博物馆 92 已独立；银鱼巷 37 含子点 53/54/6；8-zhongshan 不写入必选。",
+    "画像不强求：漫画街手绘为流动摊位，冬季出摊只能现场看。信号山与小鱼山不要做成两个满爬；若已登信号山，小鱼山仅路过/短登。总督旧址与信号山二选一深逛。",
     "按冬季风险留弹性但不固定月份：海风、结冰和短日照时缩短岸线，Day 2 独立保留 40 分钟室内暖身；太平角只公共短坡，不追日落长等。真实日落随日期核算，本稿不再断言具体月份日落和气温。场馆预约、闭馆日与海岸开放须行前核实。",
     "青岛啤酒博物馆（25a）、台东步行街（25b）、沧口大滑梯（88）挂在 Day 4 跨区专程备选：各自需专程，默认不顺路、不连线；啤博开放范围与营业须行前查官方，不写成已确认闭馆。",
     "Day 3 浮山湾主线不含小麦岛。下午 13:40–17:30 默认轻量留白（回住/附近休息），不把东线挤进 Day 3。",
-    "Day 4 默认东部海岸：小麦岛（23）为主线；石老人（24）、雕塑园（36）仅 optional，勿默认三条一起跑。崂山太清（26）为 Day 4 整日替换备选，不是东线加赛。银鱼巷、中山路一带子地点、老舍公园、邮电博物馆、金口一路、福山支路等老城小点已挂入 Day 1 对应节点 optional，均为替换/减项备选，不要全跑。",
-    "粗略累计步行（含节点内部、不含酒店往返和可选替换）：Day 1 约 5–6.5 公里，Day 2 约 5.5–7 公里，Day 3 约 3–4.5 公里，Day 4 约 2–4 公里（岛上轻走量级，另含用车往返）；拍照站立不计步行时间。均为距离/游览范围量级，不是路网测算。选用 optional 后须自行重排时长与交通，默认 segments 不变。"
+    "Day 4 默认东部海岸：小麦岛（23）为主线；石老人（24）、雕塑园（36）仅 optional，勿默认三条一起跑。崂山太清（26）为 Day 4 整日替换备选，不是东线加赛。",
+    "粗略累计步行（含节点内部、不含酒店往返和可选替换）为距离/游览范围量级，不是路网测算。选用 optional 后须自行重排时长与交通，默认 segments 不变；当前地图不绘制计划连线。"
   ],
   "exclusions": [
     {
@@ -26,48 +27,89 @@
   "days": [
     {
       "id": "day1",
-      "label": "Day 1 老城、画像与琴屿路",
+      "label": "Day 1 老城海岸预算清单",
       "date": null,
-      "summary": "09:00 起，保留栈桥、天主教堂找 Bara、漫画街画像与大学路、琴屿路孤独树小青岛。画像不再叠加登山和逛馆；晚饭约 18:40 结束。老城小点与夜线均在 optional，默认不跑、不进 segments。",
+      "summary": "用户 1–24 项顺序与地点保留；每项标注从容预算停留时长，不排一天内起止钟点。教堂/Bara 不进主线。晚饭待定。实际一天不可能全跑，按体力择项，勿把预算时长当成必须连轴完成的时刻表。",
       "nodes": [
         {
-          "id": "d1-zhanqiao",
-          "title": "栈桥短走",
-          "startTime": "09:00",
-          "endTime": "09:50",
+          "id": "d1-01-breakfast",
+          "title": "1 地二鱼汤馄饨·上街里店",
+          "durationMinutes": 40,
+          "primaryPlaceIds": [
+            "78-weixian"
+          ],
+          "optionalPlaceIds": [],
+          "notes": "预算 40 分钟。L1-21/L1-26 并存；四方路第二店不上针。早餐时段须行前核实。",
+          "meal": {
+            "kind": "breakfast",
+            "note": "候选 78-weixian；营业与是否供应早餐行前核实。"
+          }
+        },
+        {
+          "id": "d1-02-pichai",
+          "title": "2 劈柴院",
+          "durationMinutes": 30,
+          "primaryPlaceIds": [
+            "17"
+          ],
+          "optionalPlaceIds": [],
+          "notes": "预算 30 分钟。已从中山路拆出成独立主点。"
+        },
+        {
+          "id": "d1-03-choco",
+          "title": "3 巧克力博物馆",
+          "durationMinutes": 40,
+          "primaryPlaceIds": [
+            "92"
+          ],
+          "optionalPlaceIds": [],
+          "notes": "预算 40 分钟；若只看外立面约 10 分钟。开放时间行前核实，未开门则外立面一带看。"
+        },
+        {
+          "id": "d1-04-kaisnow",
+          "title": "4 凯雪·天津路店",
+          "durationMinutes": 15,
+          "primaryPlaceIds": [
+            "51-tianjin"
+          ],
+          "optionalPlaceIds": [],
+          "notes": "预算 15 分钟。仅天津路第一专卖店；不要把云霄路店绑进 Day 1。"
+        },
+        {
+          "id": "d1-05-yinyu",
+          "title": "5 银鱼巷",
+          "durationMinutes": 60,
+          "primaryPlaceIds": [
+            "37"
+          ],
+          "optionalPlaceIds": [],
+          "notes": "预算 60 分钟。子点杏一豆腐（53）、Fufuland（54）、呱呱艺术商店（6）可见。呱呱若做 DIY 再另加 30–60 分钟。DIY 非默认；兴一=杏一。"
+        },
+        {
+          "id": "d1-06-zhongshan",
+          "title": "6 中山路（其余五处）",
+          "durationMinutes": 40,
+          "primaryPlaceIds": [],
+          "optionalPlaceIds": [
+            "15"
+          ],
+          "notes": "父级 15 hideDot，仅五子点：城市记忆馆 40 分钟、金库文博馆 40 分钟、光影俱乐部 40 分钟、中山路17号外立面 10 分钟、中山路壹号路过 15 分钟。五处都进约 2.5 小时；只择一短进按本节点预算约 40 分钟。不要默认五馆全进。8-zhongshan 不写入必选。"
+        },
+        {
+          "id": "d1-07-zhanqiao",
+          "title": "7 栈桥",
           "durationMinutes": 50,
           "primaryPlaceIds": [
             "14"
           ],
           "optionalPlaceIds": [
-            "45",
-            "15"
+            "45"
           ],
-          "notes": "栈桥 30 分钟，海边拍照及短歇 20 分钟，不强求走到桥端。Good 咖啡（45）仅为栈桥附近范围点；若现场正好遇到，可用其中 20 分钟替换拍照，不专门找门牌。中山路（15）带子地点（中山路壹号、中山路17号、光影俱乐部、金库文博馆、城市记忆馆、巧克力博物馆、劈柴院）均为栈桥/中山路一带替换备选：择一或沿路短逛，须相应缩短或替换栈桥时段，勿与栈桥全时长叠加，也不要七个全跑；不进默认路线。早餐在住宿解决，不设 08:30 的必走早餐节点。"
+          "notes": "预算 50 分钟。Good 咖啡（45）仅偶遇替换，不专门找门牌。"
         },
         {
-          "id": "d1-church-bara",
-          "title": "天主教堂与 Bara",
-          "startTime": "10:15",
-          "endTime": "11:15",
-          "durationMinutes": 60,
-          "primaryPlaceIds": [
-            "16",
-            "9"
-          ],
-          "optionalPlaceIds": [
-            "30",
-            "37",
-            "29",
-            "27"
-          ],
-          "notes": "教堂外观/广场 20 分钟，找 Bara 及购买 20 分钟，休息/等候 20 分钟。Bara 是用户点名项，但仅有教堂周边范围坐标，找不到或未出摊即停止寻找，不假装已核实门店。安娜别墅（30）仅路过看外观 10 分钟，替换同量广场时间。默认不进堂；若进堂约需 30–40 分钟，须取消 Bara 等候及别墅外观，不能同时全做。银鱼巷（37）、老舍公园（29）、青岛邮电博物馆（27）为教堂/老城文博一带备选：银鱼巷若特别想去约 45–60 分钟，应替换栈桥或本节点时段，不可在教堂一小时内偷偷加回；老舍/邮电择一短访须扣减广场或等候时间。备选不要全跑，均不进默认 segments。"
-        },
-        {
-          "id": "d1-lunch",
-          "title": "午餐：33号大院·栈桥店（候选）",
-          "startTime": "11:35",
-          "endTime": "12:35",
+          "id": "d1-08-lunch",
+          "title": "8 午饭：33号大院·栈桥店",
           "durationMinutes": 60,
           "primaryPlaceIds": [
             "76-zhanqiao"
@@ -75,123 +117,405 @@
           "optionalPlaceIds": [
             "82-hb"
           ],
-          "notes": "主锚仅用湖南路分店，不用无坐标父条 76。用餐约 60 分钟；若排队超 15 分钟，换附近已营业简餐，不挤掉画像时间。",
+          "notes": "预算 60 分钟。仅 76-zhanqiao；近备选 82-hb，只择一家。",
           "meal": {
             "kind": "lunch",
-            "note": "候选主选 33号大院·栈桥店（76-zhanqiao，湖南路33号）；来源为已有 places 的公开地址，坐标是街道范围参考，当前营业、菜品、空位未实时核实。近备选海萍馄饨·湖北路店（82-hb），与主锚直线约 0.15 公里；只择一家，不为普通餐厅向北绕行。"
+            "note": "候选主选 76-zhanqiao；营业/空位未实时核实。"
           }
         },
         {
-          "id": "d1-manga-university",
-          "title": "漫画街画像与大学路片区",
-          "startTime": "12:55",
-          "endTime": "14:55",
-          "durationMinutes": 120,
+          "id": "d1-09-post",
+          "title": "9 青岛邮电博物馆",
+          "durationMinutes": 40,
           "primaryPlaceIds": [
-            "7",
+            "27"
+          ],
+          "optionalPlaceIds": [],
+          "notes": "预算 40 分钟。开放/预约行前核实。圣弥厄尔大教堂（16）与 Bara（9）不进主线，仅可视作安徽路一带附近备选（本节点不挂）。"
+        },
+        {
+          "id": "d1-10-liangyou",
+          "title": "10 良友书坊",
+          "durationMinutes": 25,
+          "primaryPlaceIds": [
+            "90"
+          ],
+          "optionalPlaceIds": [],
+          "notes": "预算 25 分钟。显示名统一「良友书坊」。"
+        },
+        {
+          "id": "d1-11-laoshe",
+          "title": "11 老舍公园",
+          "durationMinutes": 20,
+          "primaryPlaceIds": [
+            "29"
+          ],
+          "optionalPlaceIds": [],
+          "notes": "预算 20 分钟（路过/短停量级）。"
+        },
+        {
+          "id": "d1-12-boluo",
+          "title": "12 波螺油子艺术谷",
+          "durationMinutes": 50,
+          "primaryPlaceIds": [
+            "93"
+          ],
+          "optionalPlaceIds": [],
+          "notes": "预算 50 分钟。正式用字「波螺」。不要与拾贰阶中古市集自动合并。开放时间行前核实。"
+        },
+        {
+          "id": "d1-13-ershou",
+          "title": "13 二手之王市集",
+          "durationMinutes": 45,
+          "primaryPlaceIds": [
+            "93-ershou"
+          ],
+          "optionalPlaceIds": [],
+          "notes": "预算 45 分钟。与波螺油子同址；周末市集、非每日常设，出摊才加，可与第 12 项停留重叠。13:00–18:00 为笔记线索，行前核实当天是否出摊。"
+        },
+        {
+          "id": "d1-14-signal",
+          "title": "14 信号山公园",
+          "durationMinutes": 50,
+          "primaryPlaceIds": [
+            "3"
+          ],
+          "optionalPlaceIds": [],
+          "notes": "预算 50 分钟。与总督旧址只深逛一处时，另一处可改为外观/路过并缩短。"
+        },
+        {
+          "id": "d1-15-governor",
+          "title": "15 德国总督旧址博物馆",
+          "durationMinutes": 50,
+          "primaryPlaceIds": [
+            "28"
+          ],
+          "optionalPlaceIds": [],
+          "notes": "预算 50 分钟；若只看外观约 15 分钟。馆开放/预约行前核实。与信号山勿双满做。"
+        },
+        {
+          "id": "d1-16-manga",
+          "title": "16 漫画街",
+          "durationMinutes": 40,
+          "primaryPlaceIds": [
+            "7"
+          ],
+          "optionalPlaceIds": [],
+          "notes": "预算 40 分钟。子点 7-shouhui（手绘）、71（强麦）可见。若做画像再另加 45–60 分钟；画像不强求，冬季出摊只能现场看。不要把 87 Q pics 并进漫画街。"
+        },
+        {
+          "id": "d1-17-university",
+          "title": "17 大学路",
+          "durationMinutes": 20,
+          "primaryPlaceIds": [
             "32"
           ],
-          "optionalPlaceIds": [
-            "3",
-            "28",
-            "18",
-            "33",
-            "31",
-            "91",
-            "71",
-            "72"
-          ],
-          "notes": "默认仅：画像/等候最多 90 分钟、龙江路黄县路至大学路街区 20 分钟、点间移动 10 分钟，共 120 分钟。画像是用户点名内容，摊位和所需人数/时间待现场，不能保证出摊；若候时会超上限，放弃或另改一天。信号山（3）与小鱼山（18）同属登山替换备选：40–60 分钟登高连同进出约 15 分钟，只能替换画像，二者彼此不叠加，也不与完整画像叠加。总督旧址（28）为唯一室内馆备选：参观 40–50 分钟加进出 10 分钟，须至少削减/取消 60 分钟画像；与登山备选二选一，不能都加。馆开放/预约/闭馆日行前核实。福山支路（33）、金口一路（31）为漫画街/大学路一带短逛备选，择一约 20–30 分钟须从画像或街区时间扣除。荒岛书店疑似点（91）、强麦（71）、小李堂（72）都在本片区，至主锚直线不足 0.3 公里；最多择一家 15–20 分钟，且从画像或街区时间内扣除。画像、书店、馆、登山、街巷备选不是同一时段的打包清单，均不进默认 segments。"
+          "optionalPlaceIds": [],
+          "notes": "预算 20 分钟。"
         },
         {
-          "id": "d1-qinyu",
-          "title": "琴屿路、孤独的树与小青岛",
-          "startTime": "15:20",
-          "endTime": "17:15",
-          "durationMinutes": 115,
+          "id": "d1-18-xiaoyu",
+          "title": "18 小鱼山",
+          "durationMinutes": 40,
           "primaryPlaceIds": [
-            "1a",
-            "1b",
+            "18"
+          ],
+          "optionalPlaceIds": [],
+          "notes": "预算 40 分钟。若已登信号山，不要做成第二个满爬，可改为路过并缩短。"
+        },
+        {
+          "id": "d1-19-fushan",
+          "title": "19 福山支路",
+          "durationMinutes": 15,
+          "primaryPlaceIds": [
+            "33"
+          ],
+          "optionalPlaceIds": [],
+          "notes": "预算 15 分钟路过。"
+        },
+        {
+          "id": "d1-20-jinkou",
+          "title": "20 金口一路",
+          "durationMinutes": 15,
+          "primaryPlaceIds": [
+            "31"
+          ],
+          "optionalPlaceIds": [],
+          "notes": "预算 15 分钟路过。"
+        },
+        {
+          "id": "d1-21-luxun",
+          "title": "21 鲁迅公园",
+          "durationMinutes": 30,
+          "primaryPlaceIds": [
+            "95"
+          ],
+          "optionalPlaceIds": [],
+          "notes": "预算 30 分钟。市南区琴屿路1号一带；勿串外地同名公园。"
+        },
+        {
+          "id": "d1-22-qinyu",
+          "title": "22 琴屿路",
+          "durationMinutes": 25,
+          "primaryPlaceIds": [
+            "1a"
+          ],
+          "optionalPlaceIds": [],
+          "notes": "预算 25 分钟。子地点孤独的树（1b）可见。"
+        },
+        {
+          "id": "d1-23-xiaoqingdao",
+          "title": "23 小青岛",
+          "durationMinutes": 45,
+          "primaryPlaceIds": [
             "2"
           ],
-          "optionalPlaceIds": [
-            "66-old",
-            "66-new"
-          ],
-          "notes": "琴屿路 20 分钟、孤独树 10 分钟、附近移动 10 分钟、小青岛及堤道往返 60 分钟、短歇 15 分钟，共 115 分钟。第一主锚琴屿路；三个点直线虽近，上岛必须沿实际堤道往返，不能跨海直走。孤独树是约点不是树干测量。小青岛开放、预约及风浪封闭行前核实；不能入园就留在琴屿路，绝不走封闭岸线。威尔德海阳路老/新店候选（66-old/66-new）均距琴屿路主锚直线不足 0.4 公里，仅择一家暖身 25–30 分钟并相应缩短岸线/岛上时间，不能额外全加；主线无新增登山。冬季约 17 点前后可能已暗，按实际日落提前撤离，不保证本时段恰好日落。"
+          "optionalPlaceIds": [],
+          "notes": "上岛预算 45 分钟；若仅岸上看约 15 分钟。须走实际堤道；开放与时间行前核实。"
         },
         {
-          "id": "d1-dinner",
-          "title": "晚餐：众品·广西路栈桥店（候选）",
-          "startTime": "17:40",
-          "endTime": "18:40",
+          "id": "d1-24-dinner",
+          "title": "24 晚饭：就近待选正餐（不指定店名）",
           "durationMinutes": 60,
-          "primaryPlaceIds": [
-            "81-gx"
-          ],
-          "optionalPlaceIds": [
-            "82-hb",
-            "39",
-            "40",
-            "41"
-          ],
-          "notes": "约 60 分钟用餐，结束后默认回住休息。江苏路基督教堂（39）、观象一路（40）、观象二路（41）仅作晚饭后可选夜线备选，仍不是必选；若选用须另留体力与时间，不进默认 segments，也不与本节点用餐叠加进主线。熹知酒馆仍不排入。此节点是普通晚餐，不是第二场夜游。",
+          "primaryPlaceIds": [],
+          "optionalPlaceIds": [],
+          "notes": "预算 60 分钟。不指定餐厅、不编造店名；酒馆不能替代正餐。",
           "meal": {
             "kind": "dinner",
-            "note": "候选主选 众品·广西路栈桥店（81-gx，广西路57号，已有 places 具体分店），回老城方向就餐，不再北上无棣二路福多多。营业和晚间是否供应未实时核实；近备选 82-hb 约 0.26 公里，只择一家。若当天不营业，直接在广西路/太平路公共街区就近选已营业饭店，店名待定，不编造确认。"
+            "note": "就近待选正餐饭店；店名待行前按落脚点补录。"
           }
         }
       ],
       "segments": [
         {
-          "id": "s-d1-zhanqiao-d1-church-bara",
-          "fromNodeId": "d1-zhanqiao",
-          "toNodeId": "d1-church-bara",
+          "id": "s-d1-01-breakfast-d1-02-pichai",
+          "fromNodeId": "d1-01-breakfast",
+          "toNodeId": "d1-02-pichai",
           "mode": "walk",
-          "estimatedMinutes": 25,
+          "estimatedMinutes": null,
           "geometry": null,
           "routeKind": "schematic",
-          "note": "两节点首个主锚的 WGS84 球面直线距离约 0.83 公里，仅为下限筛查；预计街道步行约 1.0–1.2 公里，按约 3 公里/小时并留过街缓冲，共 25 分钟；这是略超 20 分钟的短段例外，寒风大可短途用车 示意连线不是导航，不代表道路可直达。"
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
         },
         {
-          "id": "s-d1-church-bara-d1-lunch",
-          "fromNodeId": "d1-church-bara",
-          "toNodeId": "d1-lunch",
+          "id": "s-d1-02-pichai-d1-03-choco",
+          "fromNodeId": "d1-02-pichai",
+          "toNodeId": "d1-03-choco",
           "mode": "walk",
-          "estimatedMinutes": 15,
+          "estimatedMinutes": null,
           "geometry": null,
           "routeKind": "schematic",
-          "note": "两节点首个主锚的 WGS84 球面直线距离约 0.41 公里，仅为下限筛查；预计街道约 0.5–0.7 公里，15 分钟；节点间另有 5 分钟弹性 示意连线不是导航，不代表道路可直达。"
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
         },
         {
-          "id": "s-d1-lunch-d1-manga-university",
-          "fromNodeId": "d1-lunch",
-          "toNodeId": "d1-manga-university",
-          "mode": "taxi",
-          "estimatedMinutes": 20,
+          "id": "s-d1-03-choco-d1-04-kaisnow",
+          "fromNodeId": "d1-03-choco",
+          "toNodeId": "d1-04-kaisnow",
+          "mode": "walk",
+          "estimatedMinutes": null,
           "geometry": null,
           "routeKind": "schematic",
-          "note": "两节点首个主锚的 WGS84 球面直线距离约 1.00 公里，仅为下限筛查；街道有坡度且直线已近 1 公里，默认短途出租车，含候车和下车走到街口；拥堵时压缩画像等待而非许诺 5 分钟到达 示意连线不是导航，不代表道路可直达。"
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
         },
         {
-          "id": "s-d1-manga-university-d1-qinyu",
-          "fromNodeId": "d1-manga-university",
-          "toNodeId": "d1-qinyu",
-          "mode": "taxi",
-          "estimatedMinutes": 20,
+          "id": "s-d1-04-kaisnow-d1-05-yinyu",
+          "fromNodeId": "d1-04-kaisnow",
+          "toNodeId": "d1-05-yinyu",
+          "mode": "walk",
+          "estimatedMinutes": null,
           "geometry": null,
           "routeKind": "schematic",
-          "note": "两节点首个主锚的 WGS84 球面直线距离约 1.14 公里，仅为下限筛查；默认出租车至公共可达下客点再步行至琴屿路，留 25 分钟空档；不将 1.14 公里直线写成 15 分钟步行 示意连线不是导航，不代表道路可直达。"
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
         },
         {
-          "id": "s-d1-qinyu-d1-dinner",
-          "fromNodeId": "d1-qinyu",
-          "toNodeId": "d1-dinner",
-          "mode": "taxi",
-          "estimatedMinutes": 20,
+          "id": "s-d1-05-yinyu-d1-06-zhongshan",
+          "fromNodeId": "d1-05-yinyu",
+          "toNodeId": "d1-06-zhongshan",
+          "mode": "walk",
+          "estimatedMinutes": null,
           "geometry": null,
           "routeKind": "schematic",
-          "note": "两节点首个主锚的 WGS84 球面直线距离约 1.34 公里，仅为下限筛查；先在上一节点内完成堤道返程，从合法街边上车到广西路，含候车估 20 分钟，另留 5 分钟缓冲；不能从小青岛中心直接上车 示意连线不是导航，不代表道路可直达。"
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
+        },
+        {
+          "id": "s-d1-06-zhongshan-d1-07-zhanqiao",
+          "fromNodeId": "d1-06-zhongshan",
+          "toNodeId": "d1-07-zhanqiao",
+          "mode": "walk",
+          "estimatedMinutes": null,
+          "geometry": null,
+          "routeKind": "schematic",
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
+        },
+        {
+          "id": "s-d1-07-zhanqiao-d1-08-lunch",
+          "fromNodeId": "d1-07-zhanqiao",
+          "toNodeId": "d1-08-lunch",
+          "mode": "walk",
+          "estimatedMinutes": null,
+          "geometry": null,
+          "routeKind": "schematic",
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
+        },
+        {
+          "id": "s-d1-08-lunch-d1-09-post",
+          "fromNodeId": "d1-08-lunch",
+          "toNodeId": "d1-09-post",
+          "mode": "walk",
+          "estimatedMinutes": null,
+          "geometry": null,
+          "routeKind": "schematic",
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
+        },
+        {
+          "id": "s-d1-09-post-d1-10-liangyou",
+          "fromNodeId": "d1-09-post",
+          "toNodeId": "d1-10-liangyou",
+          "mode": "walk",
+          "estimatedMinutes": null,
+          "geometry": null,
+          "routeKind": "schematic",
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
+        },
+        {
+          "id": "s-d1-10-liangyou-d1-11-laoshe",
+          "fromNodeId": "d1-10-liangyou",
+          "toNodeId": "d1-11-laoshe",
+          "mode": "walk",
+          "estimatedMinutes": null,
+          "geometry": null,
+          "routeKind": "schematic",
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
+        },
+        {
+          "id": "s-d1-11-laoshe-d1-12-boluo",
+          "fromNodeId": "d1-11-laoshe",
+          "toNodeId": "d1-12-boluo",
+          "mode": "walk",
+          "estimatedMinutes": null,
+          "geometry": null,
+          "routeKind": "schematic",
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
+        },
+        {
+          "id": "s-d1-12-boluo-d1-13-ershou",
+          "fromNodeId": "d1-12-boluo",
+          "toNodeId": "d1-13-ershou",
+          "mode": "walk",
+          "estimatedMinutes": null,
+          "geometry": null,
+          "routeKind": "schematic",
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
+        },
+        {
+          "id": "s-d1-13-ershou-d1-14-signal",
+          "fromNodeId": "d1-13-ershou",
+          "toNodeId": "d1-14-signal",
+          "mode": "walk",
+          "estimatedMinutes": null,
+          "geometry": null,
+          "routeKind": "schematic",
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
+        },
+        {
+          "id": "s-d1-14-signal-d1-15-governor",
+          "fromNodeId": "d1-14-signal",
+          "toNodeId": "d1-15-governor",
+          "mode": "walk",
+          "estimatedMinutes": null,
+          "geometry": null,
+          "routeKind": "schematic",
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
+        },
+        {
+          "id": "s-d1-15-governor-d1-16-manga",
+          "fromNodeId": "d1-15-governor",
+          "toNodeId": "d1-16-manga",
+          "mode": "walk",
+          "estimatedMinutes": null,
+          "geometry": null,
+          "routeKind": "schematic",
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
+        },
+        {
+          "id": "s-d1-16-manga-d1-17-university",
+          "fromNodeId": "d1-16-manga",
+          "toNodeId": "d1-17-university",
+          "mode": "walk",
+          "estimatedMinutes": null,
+          "geometry": null,
+          "routeKind": "schematic",
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
+        },
+        {
+          "id": "s-d1-17-university-d1-18-xiaoyu",
+          "fromNodeId": "d1-17-university",
+          "toNodeId": "d1-18-xiaoyu",
+          "mode": "walk",
+          "estimatedMinutes": null,
+          "geometry": null,
+          "routeKind": "schematic",
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
+        },
+        {
+          "id": "s-d1-18-xiaoyu-d1-19-fushan",
+          "fromNodeId": "d1-18-xiaoyu",
+          "toNodeId": "d1-19-fushan",
+          "mode": "walk",
+          "estimatedMinutes": null,
+          "geometry": null,
+          "routeKind": "schematic",
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
+        },
+        {
+          "id": "s-d1-19-fushan-d1-20-jinkou",
+          "fromNodeId": "d1-19-fushan",
+          "toNodeId": "d1-20-jinkou",
+          "mode": "walk",
+          "estimatedMinutes": null,
+          "geometry": null,
+          "routeKind": "schematic",
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
+        },
+        {
+          "id": "s-d1-20-jinkou-d1-21-luxun",
+          "fromNodeId": "d1-20-jinkou",
+          "toNodeId": "d1-21-luxun",
+          "mode": "walk",
+          "estimatedMinutes": null,
+          "geometry": null,
+          "routeKind": "schematic",
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
+        },
+        {
+          "id": "s-d1-21-luxun-d1-22-qinyu",
+          "fromNodeId": "d1-21-luxun",
+          "toNodeId": "d1-22-qinyu",
+          "mode": "walk",
+          "estimatedMinutes": null,
+          "geometry": null,
+          "routeKind": "schematic",
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
+        },
+        {
+          "id": "s-d1-22-qinyu-d1-23-xiaoqingdao",
+          "fromNodeId": "d1-22-qinyu",
+          "toNodeId": "d1-23-xiaoqingdao",
+          "mode": "walk",
+          "estimatedMinutes": null,
+          "geometry": null,
+          "routeKind": "schematic",
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
+        },
+        {
+          "id": "s-d1-23-xiaoqingdao-d1-24-dinner",
+          "fromNodeId": "d1-23-xiaoqingdao",
+          "toNodeId": "d1-24-dinner",
+          "mode": "walk",
+          "estimatedMinutes": null,
+          "geometry": null,
+          "routeKind": "schematic",
+          "note": "顺序示意保留；非一天内时刻表转场。当前地图不绘制计划连线。"
         }
       ]
     },

@@ -2,8 +2,8 @@
  * 校验 places.json 是否还能被地图引擎正常吃进去。
  *
  * 检查项：
- * - 正好 93 条主地点（中山路子地点合并后；若你故意增删，改下面的期望数量）
- * - id 全局唯一（含 candidates）；当前期望 121 个 id
+ * - 正好 92 条主地点（t68 Day1 拆分/归组后；若你故意增删，改下面的期望数量）
+ * - id 全局唯一（含 candidates）；当前期望 125 个 id
  * - category / precision 落在允许枚举内（候选可选自带 category）
  * - 非 pending、且未 hideDot 的点必须有 lat/lon
  *
@@ -26,8 +26,8 @@ function fail(msg) {
   errors += 1
 }
 
-const EXPECTED_PLACE_COUNT = 93
-const EXPECTED_ID_COUNT = 121
+const EXPECTED_PLACE_COUNT = 92
+const EXPECTED_ID_COUNT = 125
 
 if (!Array.isArray(places) || places.length !== EXPECTED_PLACE_COUNT) {
   fail(`expected ${EXPECTED_PLACE_COUNT} places, got ${places?.length}`)
