@@ -87,7 +87,7 @@ if (typeof window !== "undefined") {
     viewKey: "play"
   };
 
-  var map, layers = {}, fallbackGroup, highlightGroup, labelRoot, svgRoot;
+  var map, layers = {}, fallbackGroup, highlightGroup, labelRoot, areaRoot, svgRoot;
   /** id → { place, cand?, latlng, visLatLng, marker, circle } 便于点击/筛选联动 */
   var featureIndex = {};
 
@@ -675,9 +675,11 @@ if (typeof window !== "undefined") {
   /* ========== 常显文字标签（地点名 + 区域名，带简单避让）========== */
   function layoutLabels() {
     labelRoot.innerHTML = "";
+    if (areaRoot) areaRoot.innerHTML = "";
     svgRoot.innerHTML = "";
     var z = map.getZoom();
-    if (state.showAreas) {
+    /* 区域名单独一层、压在圆点之下，并略偏锚点上方，避免盖住目标点 */
+    if (state.showAreas && areaRoot) {
       (DATA.areaLabels || []).forEach(function (a) {
         if (z < a.minZ || z > a.maxZ) return;
         var pt = map.latLngToContainerPoint([a.lat, a.lon]);
@@ -686,7 +688,7 @@ if (typeof window !== "undefined") {
         el.textContent = a.name;
         el.style.left = pt.x + "px";
         el.style.top = pt.y + "px";
-        labelRoot.appendChild(el);
+        areaRoot.appendChild(el);
       });
     }
     syncHoverTips();
@@ -718,10 +720,10 @@ if (typeof window !== "undefined") {
     var pad = 4;
     var padBottom = pad;
     if (isMobile()) {
-      /* H5：展开时是 el-drawer；收起时只有底部按钮 */
-      var drawer = document.querySelector(".h5-place-drawer.el-drawer");
-      if (state.panelOpen && drawer) {
-        padBottom = (drawer.offsetHeight || Math.round(window.innerHeight * 0.58)) + 8;
+      /* H5：展开时是底部半屏 #h5-sheet；收起时只有悬浮按钮 */
+      var sheet = $("h5-sheet");
+      if (state.panelOpen && sheet) {
+        padBottom = (sheet.offsetHeight || Math.round(window.innerHeight * 0.55)) + 8;
       } else {
         padBottom = 64 + 8;
       }
@@ -1135,6 +1137,12 @@ if (typeof window !== "undefined") {
 
     /* Subtle land tint when tiles work is provided by the basemap itself. */
     addMarkers();
+
+    /* 区域名在圆点之下（z≈500）；地点名在圆点之上（z≈680） */
+    areaRoot = document.createElement("div");
+    areaRoot.id = "area-label-layer";
+    areaRoot.setAttribute("aria-hidden", "true");
+    map.getContainer().appendChild(areaRoot);
 
     labelRoot = document.createElement("div");
     labelRoot.id = "label-layer";

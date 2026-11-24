@@ -1,10 +1,9 @@
 <script setup lang="ts">
 /**
  * PC：右侧常驻栏
- * H5：底部 el-drawer（Element Plus）+ 收起时底部悬浮按钮
+ * H5：底部半屏面板（贴在 #main 里，不占满全屏、无遮罩），上方地图可继续拖动
  *
  * PC / H5 互斥挂载，保证 PanelBody（#list）同一时间只有一份。
- * 抽屉 destroy-on-close=false，打开过后清单 DOM 会保留。
  */
 import { nextTick, ref, watch } from 'vue'
 import { ArrowDown, ArrowUp } from '@element-plus/icons-vue'
@@ -63,7 +62,7 @@ defineExpose({ openPanel, closePanel, panelOpen })
     <PanelBody />
   </aside>
 
-  <!-- ===== H5：Element Plus 底部抽屉 ===== -->
+  <!-- ===== H5：底部半屏（无全屏遮罩，地图上半区可交互） ===== -->
   <template v-else>
     <div
       v-show="!panelOpen"
@@ -83,29 +82,21 @@ defineExpose({ openPanel, closePanel, panelOpen })
       </el-button>
     </div>
 
-    <el-drawer
-      v-model="panelOpen"
-      class="h5-place-drawer"
-      direction="btt"
-      size="58%"
-      :with-header="true"
-      :show-close="false"
-      :append-to-body="true"
-      :destroy-on-close="false"
-      :modal="false"
-      :z-index="3000"
+    <aside
+      v-show="panelOpen"
+      id="h5-sheet"
+      class="h5-sheet"
+      aria-label="地点与说明"
     >
-      <template #header>
-        <div class="h5-drawer-head">
-          <span class="h5-drawer-title">地点与说明</span>
-          <el-button text type="primary" @click="closePanel">
-            收起
-            <el-icon class="el-icon--right"><ArrowDown /></el-icon>
-          </el-button>
-        </div>
-      </template>
+      <div class="h5-sheet-head">
+        <span class="h5-sheet-title">地点与说明</span>
+        <el-button text type="primary" @click="closePanel">
+          收起
+          <el-icon class="el-icon--right"><ArrowDown /></el-icon>
+        </el-button>
+      </div>
       <PanelBody />
-    </el-drawer>
+    </aside>
   </template>
 </template>
 
@@ -147,45 +138,39 @@ defineExpose({ openPanel, closePanel, panelOpen })
   box-shadow: 0 8px 24px rgba(28, 42, 46, 0.18);
 }
 
-.h5-drawer-head {
+/* 只占底部 ~55%，不盖住地图上半部分，因此地图仍可拖 */
+.h5-sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2000;
+  height: min(55vh, 520px);
+  max-height: calc(100% - 72px);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--panel, #fffdf8);
+  border-top: 1px solid var(--line, #d8d0c4);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -10px 28px rgba(28, 42, 46, 0.18);
+  pointer-events: auto;
+}
+.h5-sheet-head {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
   gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line, #d8d0c4);
 }
-.h5-drawer-title {
+.h5-sheet-title {
   font-weight: 700;
   font-size: 15px;
 }
-</style>
-
-<style>
-/* drawer 挂到 body，需全局样式 */
-.h5-place-drawer.el-drawer {
-  border-radius: 16px 16px 0 0;
-  overflow: hidden;
-  background: var(--panel, #fffdf8);
-}
-.h5-place-drawer .el-drawer__header {
-  margin-bottom: 0;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--line, #d8d0c4);
-}
-.h5-place-drawer .el-drawer__body {
-  padding: 0;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  background: var(--panel, #fffdf8);
-}
-/* 无 mask：全屏容器不拦事件，只有抽屉本体可点；地图可继续拖 */
-body .el-overlay-dialog:has(.h5-place-drawer),
-body .el-drawer__container:has(.h5-place-drawer) {
-  pointer-events: none !important;
-  background: transparent !important;
-}
-.h5-place-drawer.el-drawer {
-  box-shadow: 0 -10px 28px rgba(28, 42, 46, 0.18);
-  pointer-events: auto !important;
+.h5-sheet :deep(.panel-body) {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 </style>
