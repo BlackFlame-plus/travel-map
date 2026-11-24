@@ -114,14 +114,6 @@ onMounted(() => {
       <span><i class="swatch culture" />文创体验（绿）</span>
     </div>
 
-    <el-alert
-      type="info"
-      :closable="false"
-      show-icon
-      class="hint-alert"
-      title="地点名默认常显；关掉后鼠标悬停圆点可看名称。实心点多为精确位置，描边/虚线圈为约略范围。底图可在右上角切换。坐标 WGS84。"
-    />
-
     <!-- 引擎灌行程说明 / 清单；详情 #detail 已改成地图上的悬浮卡（见 App.vue） -->
     <div id="doc-guide" />
     <div class="section-title">地点清单</div>
@@ -159,14 +151,6 @@ onMounted(() => {
 }
 .search-input {
   margin-bottom: 8px;
-}
-.hint-alert {
-  margin-bottom: 10px;
-}
-.hint-alert :deep(.el-alert__title) {
-  font-size: 12px;
-  line-height: 1.45;
-  font-weight: 500;
 }
 @media (max-width: 360px) {
   .panel-body {
