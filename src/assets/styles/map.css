@@ -315,9 +315,9 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
   margin: 0;
   min-width: 88px;
 }
-/* Leaflet 右上角缩放：紧挨底图切换下方，右对齐 */
+/* Leaflet 右上角缩放：紧挨底图控件（含名称开关）下方，右对齐 */
 #map .leaflet-top.leaflet-right {
-  top: 96px;
+  top: 168px;
   right: 10px;
 }
 #map .leaflet-top.leaflet-right .leaflet-control {
@@ -352,7 +352,7 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
     padding: 6px 8px;
   }
   #map .leaflet-top.leaflet-right {
-    top: 88px;
+    top: 156px;
     right: 8px;
   }
   /* H5：同样贴左上，避开右侧底图切换与底部握把 */

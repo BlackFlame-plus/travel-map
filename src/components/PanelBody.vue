@@ -16,8 +16,6 @@ const CATS = [
 ] as const
 
 const query = ref('')
-const showNames = ref(true)
-const showAreas = ref(true)
 const catOn = reactive({
   scenic: true,
   food: true,
@@ -35,18 +33,6 @@ function onSearch(val: string) {
   api()?.setQuery?.(val)
 }
 
-function onNamesChange(val: boolean | string | number) {
-  const on = !!val
-  showNames.value = on
-  api()?.setShowNames?.(on)
-}
-
-function onAreasChange(val: boolean | string | number) {
-  const on = !!val
-  showAreas.value = on
-  api()?.setShowAreas?.(on)
-}
-
 function onCatChange(key: keyof typeof catOn, checked: boolean) {
   catOn[key] = checked
   api()?.setCategory?.(key, checked)
@@ -60,31 +46,6 @@ onMounted(() => {
 
 <template>
   <div id="panel-body" class="panel-body">
-    <div class="tool-block switch-row">
-      <div class="switch-item">
-        <span class="switch-label">地点名</span>
-        <el-switch
-          :model-value="showNames"
-          size="small"
-          inline-prompt
-          active-text="开"
-          inactive-text="关"
-          @change="onNamesChange"
-        />
-      </div>
-      <div class="switch-item">
-        <span class="switch-label">区域名</span>
-        <el-switch
-          :model-value="showAreas"
-          size="small"
-          inline-prompt
-          active-text="开"
-          inactive-text="关"
-          @change="onAreasChange"
-        />
-      </div>
-    </div>
-
     <el-input
       id="search"
       :model-value="query"
@@ -135,22 +96,6 @@ onMounted(() => {
 }
 .tool-block {
   margin: 0 0 8px;
-}
-.switch-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px 20px;
-  align-items: center;
-}
-.switch-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.switch-label {
-  font-size: 13px;
-  font-weight: 650;
-  color: var(--ink, #1c2a2e);
 }
 .search-input {
   margin-bottom: 8px;

@@ -1153,7 +1153,11 @@ if (typeof window !== "undefined") {
     var banner = $("tile-banner");
     if (banner) map.getContainer().appendChild(banner);
     var switchEl = $("basemap-switch");
-    if (switchEl) map.getContainer().appendChild(switchEl);
+    if (switchEl) {
+      map.getContainer().appendChild(switchEl);
+      L.DomEvent.disableClickPropagation(switchEl);
+      L.DomEvent.disableScrollPropagation(switchEl);
+    }
     var detailEl = $("detail");
     if (detailEl) {
       map.getContainer().appendChild(detailEl);
