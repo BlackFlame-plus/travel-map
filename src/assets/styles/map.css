@@ -171,6 +171,27 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
   border-radius: 999px;
   padding: 1px 7px;
 }
+/* 计划节点：标题单行省略，时间靠右不换行 */
+.list-acc.plan-node > summary {
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+.list-acc.plan-node > summary .plan-node-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.list-acc.plan-node > summary .acc-count {
+  flex: 0 0 auto;
+  margin-left: auto;
+  white-space: nowrap;
+}
+.list-acc.plan-node > summary::after {
+  margin-left: 0;
+  flex: 0 0 auto;
+}
 .list-acc-body {
   display: flex;
   flex-direction: column;

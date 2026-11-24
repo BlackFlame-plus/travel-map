@@ -1173,16 +1173,6 @@ if (typeof window !== "undefined") {
       html += "</div></details>";
     });
 
-    var excl = tripPlan.exclusions || [];
-    if (excl.length) {
-      html += '<p class="hint plan-excl">计划排除：';
-      html += excl.map(function (ex) {
-        var pl = placeById(ex.placeId);
-        return escapeHtml((pl && pl.name) || ex.placeId);
-      }).join("、");
-      html += "</p>";
-    }
-
     box.innerHTML = html;
     box.querySelectorAll(".item").forEach(function (el) {
       el.addEventListener("click", function () {
