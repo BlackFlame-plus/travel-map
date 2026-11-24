@@ -969,7 +969,7 @@ if (typeof window !== "undefined") {
       var q = encodeURIComponent(it.searchQuery || p.searchQuery || ((it.name || p.name) + " 青岛"));
       html += '<a href="https://www.openstreetmap.org/search?query=' + q + '" target="_blank" rel="noopener noreferrer">OSM 搜索</a></div>';
     }
-    html += '<p class="src">来源：' + escapeHtml(it.source || p.source || "") + "</p>';
+    html += '<p class="src">来源：' + escapeHtml(it.source || p.source || "") + "</p>";
     if (p.candidates && p.candidates.length && !found.isCand) {
       html += '<div class="section-title">候选位置（未指定去哪一处）</div><div id="cand-mini">';
       p.candidates.forEach(function (c) {
