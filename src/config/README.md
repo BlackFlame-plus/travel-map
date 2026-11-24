@@ -114,30 +114,38 @@ npm run validate:trip-plan
 
 地点坐标**不要**写进本文件；用 `places.json` / `candidates` 的全局 `id` 引用。
 
+### 日结构约定（已与用户确认）
+
+- 默认 **恰好 3 个完整游览日**：`day1` / `day2` / `day3`，`date: null`（时间住宿未定，不绑元旦日期）。
+- **不要**加 Day0 / Day4 假装抵达/返程游玩日。
+- 草案主题可写在 `summary`；真正节点进 `nodes`/`segments` 后把 `contentStatus` 改为 `draft` 或 `ready`。
+- 陈记食集 `placeId: "10"` 只进 `exclusions`，不删 places。
+- 老杰克：默认一晚放某节点 `primaryPlaceIds`（或 notes）；其余分店只进 `optionalPlaceIds`。
+
 ```json
 {
   "schemaVersion": 1,
   "timezone": "Asia/Shanghai",
-  "contentStatus": "awaiting-planner",
-  "assumptions": ["说明性假设，给人看"],
-  "exclusions": [{ "placeId": "10", "reason": "本次行程排除" }],
+  "contentStatus": "draft",
+  "assumptions": ["市南可调整草案；date 均为 null"],
+  "exclusions": [{ "placeId": "10", "reason": "陈记食集：本次行程排除，不为它绕路" }],
   "days": [
     {
       "id": "day1",
       "label": "Day 1",
       "date": null,
-      "summary": "当日摘要",
+      "summary": "老城—画像—琴屿路",
       "nodes": [
         {
           "id": "d1-n1",
-          "title": "片区/节点名",
-          "startTime": "10:00",
-          "endTime": "12:00",
-          "durationMinutes": 120,
-          "primaryPlaceIds": ["1a"],
-          "optionalPlaceIds": ["50"],
-          "meal": { "kind": "lunch", "note": "可选" },
-          "notes": "可步行归入本节点的说明"
+          "title": "老城",
+          "startTime": null,
+          "endTime": null,
+          "durationMinutes": null,
+          "primaryPlaceIds": ["景点锚点id"],
+          "optionalPlaceIds": ["近距餐饮或咖啡id"],
+          "meal": null,
+          "notes": "室内馆只主选1；登山可选说明可写这里"
         }
       ],
       "segments": [
@@ -157,13 +165,40 @@ npm run validate:trip-plan
 }
 ```
 
-| 字段 | 含义 |
-|------|------|
-| `contentStatus` | `awaiting-planner` 骨架待填 / `draft` 草案 / `ready` 可发布（ready 时不允许空 nodes） |
-| `exclusions` | 从**计划**排除的 placeId（不删 places 主记录）。例：陈记食集 `10` |
-| `nodes[].primaryPlaceIds` | 节点锚点（优先景点），用于定位与主路线端点 |
-| `nodes[].optionalPlaceIds` | 节点附近可选餐饮/咖啡等，**不**进主路线 |
-| `segments` | 只连接实际计划节点；`mode`: walk/transit/ferry/taxi/other |
-| `routeKind` | `schematic` 或无 geometry → 直线示意并标注「路线示意，非导航」 |
+### 字段一览（策划填内容用）
 
-策划填内容后把 `contentStatus` 改为 `draft` 或 `ready`，再跑 `npm run validate:trip-plan`。
+| 路径 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `schemaVersion` | number | 是 | 固定 `1` |
+| `timezone` | string | 是 | 建议 `Asia/Shanghai` |
+| `contentStatus` | string | 是 | `awaiting-planner` \| `draft` \| `ready`（`ready` 时不允许空 `nodes`） |
+| `assumptions` | string[] | 否 | 给人看的假设/约束 |
+| `exclusions[]` | object | 否 | 计划排除（不删主数据） |
+| `exclusions[].placeId` | string | 是* | places/candidates 全局 id |
+| `exclusions[].reason` | string | 是* | 排除原因 |
+| `days[]` | object | 是 | 游览日列表（默认 3 天） |
+| `days[].id` | string | 是 | 唯一，建议 `day1`/`day2`/`day3` |
+| `days[].label` | string | 是 | UI 按钮文案，如 `Day 1` |
+| `days[].date` | string\|null | 否 | `YYYY-MM-DD` 或 **`null`（当前约定）** |
+| `days[].summary` | string\|null | 否 | 当日一句话主题 |
+| `days[].nodes[]` | object | 是 | 可先 `[]`；定稿后按行程节点填 |
+| `nodes[].id` | string | 是 | 全局唯一节点 id（建议 `d1-n1`） |
+| `nodes[].title` | string | 是 | 节点名（片区/景点锚） |
+| `nodes[].startTime` | string\|null | 否 | `HH:mm`，未定可 `null` |
+| `nodes[].endTime` | string\|null | 否 | `HH:mm`，未定可 `null` |
+| `nodes[].durationMinutes` | number\|null | 否 | 停留分钟 |
+| `nodes[].primaryPlaceIds` | string[] | 是 | 锚点 id，至少一个；优先景点 |
+| `nodes[].optionalPlaceIds` | string[] | 否 | 近且可步行的餐饮/咖啡/备选分店，**不进主路线** |
+| `nodes[].meal` | object\|null | 否 | `{ kind, note }`；`kind` 如 breakfast/lunch/dinner/snack |
+| `nodes[].notes` | string\|null | 否 | 可选说明（登山可选、馆只选1 等） |
+| `days[].segments[]` | object | 是 | 可先 `[]`；只连实际计划节点 |
+| `segments[].id` | string | 是 | 唯一路段 id |
+| `segments[].fromNodeId` | string | 是 | = 某 `nodes[].id` |
+| `segments[].toNodeId` | string | 是 | = 某 `nodes[].id` |
+| `segments[].mode` | string | 是 | `walk` \| `transit` \| `ferry` \| `taxi` \| `other` |
+| `segments[].estimatedMinutes` | number\|null | 否 | 估时 |
+| `segments[].geometry` | [lat,lon][]\|null | 否 | 有则折线；无则直线示意 |
+| `segments[].routeKind` | string\|null | 否 | `schematic` \| `mapped`；无 geometry 当 schematic |
+| `segments[].note` | string\|null | 否 | 建议示意线写「路线示意，非导航」 |
+
+填完后：`npm run validate:trip-plan`（或 `npm run validate`）。
