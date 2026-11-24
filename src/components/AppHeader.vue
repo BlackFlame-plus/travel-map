@@ -1,19 +1,23 @@
 <script setup lang="ts">
 /**
- * 顶栏：标题 + 副标题。
- * 移动端 CSS 会隐藏 .sub，并给 header 加顶部内边距，避免贴住微信浏览器顶栏。
+ * 顶栏：PC 显示标题+副标题；H5 只显示标题（副标题用 CSS/此处 v-if 藏）
+ * 顶部 padding 含 safe-area，避免微信里贴顶。
  */
+import { useIsMobile } from '../composables/useBreakpoint'
+
 defineProps<{
   title: string
   subtitle: string
 }>()
+
+const { isMobile } = useIsMobile()
 </script>
 
 <template>
   <header class="app-head">
     <div class="head-text">
       <h1>{{ title }}</h1>
-      <div class="sub">{{ subtitle }}</div>
+      <div v-if="!isMobile" class="sub">{{ subtitle }}</div>
     </div>
   </header>
 </template>

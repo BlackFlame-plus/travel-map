@@ -30,6 +30,16 @@
   --safe-b: env(safe-area-inset-bottom, 0px); /* Home 指示条 */
   --font: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Source Han Sans SC",
           "Microsoft YaHei", "WenQuanYi Micro Hei", system-ui, sans-serif;
+
+  /* Element Plus 主题跟地图配色对齐 */
+  --el-color-primary: #1a6f7a;
+  --el-color-primary-light-3: #4a949c;
+  --el-color-primary-light-5: #76adb3;
+  --el-color-primary-light-7: #a3c6ca;
+  --el-color-primary-light-9: #e8f2f3;
+  --el-color-primary-dark-2: #155960;
+  --el-border-radius-base: 8px;
+  --el-font-family: var(--font);
 }
 *, *::before, *::after { box-sizing: border-box; }
 html, body {
@@ -104,39 +114,7 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
 }
 .area-label.district { font-size: 15px; color: #2c4a58; }
 .area-label.local { font-size: 12px; letter-spacing: .18em; color: #3d5c4a; }
-#panel {
-  flex: 0 0 340px; width: 340px; max-width: 100%;
-  background: var(--panel); border-left: 1px solid var(--line);
-  display: flex; flex-direction: column; min-height: 0; z-index: 30;
-  box-shadow: -6px 0 20px rgba(28,42,46,.06);
-  pointer-events: auto;
-}
-#panel-grip {
-  display: none; flex: 0 0 36px; align-items: center; justify-content: center;
-  cursor: pointer; border: 0; background: var(--panel); color: var(--ink);
-  font: inherit; font-weight: 650; width: 100%;
-}
-#panel-grip .chev { margin-left: 6px; font-size: 11px; color: var(--muted); }
-#panel-body {
-  flex: 1 1 auto; overflow: auto; overscroll-behavior: contain;
-  padding: 10px 12px 16px; min-height: 0; -webkit-overflow-scrolling: touch;
-}
-.tools { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
-.tools button, .chip, .icon-btn {
-  font: inherit; font-size: 12px; border: 1px solid var(--line);
-  background: #fff; color: var(--ink); border-radius: 999px;
-  padding: 5px 10px; cursor: pointer; line-height: 1.2;
-}
-.tools button:hover, .chip:hover { border-color: var(--accent); color: var(--accent); }
-.tools button.active, .chip.active {
-  background: var(--accent); color: #fff; border-color: var(--accent);
-}
-#search {
-  width: 100%; font: inherit; font-size: 14px; padding: 7px 10px;
-  border: 1px solid var(--line); border-radius: 8px; background: #fff;
-  margin-bottom: 8px;
-}
-#search:focus { outline: 2px solid rgba(26,111,122,.35); border-color: var(--accent); }
+/* #panel / #panel-body 布局改由 SidePanel.vue / PanelBody.vue 负责（PC 侧栏 + H5 底栏） */
 .legend { display: flex; flex-wrap: wrap; gap: 8px 12px; margin: 4px 0 8px; font-size: 12px; color: var(--muted); }
 .legend span { display: inline-flex; align-items: center; gap: 5px; }
 .swatch {
@@ -199,46 +177,31 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
 /* keep default markers unused but harmless */
 .qd-tooltip { display: none; }
 
+/* 底图切换：默认藏在 #main；引擎挪进 #map 后显示（PC/H5 同位置） */
 #basemap-switch {
   display: none;
 }
 #map #basemap-switch {
   display: flex;
   flex-direction: column;
+  gap: 6px;
   position: absolute;
   top: 80px;
   right: 10px;
   z-index: 1000;
   margin: 0;
-  padding: 0;
-  border: 2px solid rgba(0,0,0,.25);
-  border-radius: 4px;
-  overflow: hidden;
-  background: #fff;
-  box-shadow: 0 1px 5px rgba(0,0,0,.35);
-  font: 12px/1.25 var(--font);
-  min-width: 112px;
+  padding: 6px;
+  border-radius: 10px;
+  background: rgba(255, 253, 248, 0.94);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--line);
 }
-#basemap-switch button {
-  font: inherit;
-  border: 0;
-  border-bottom: 1px solid #ddd;
-  background: #fff;
-  color: #222;
-  padding: 7px 11px;
-  cursor: pointer;
-  text-align: left;
+#map #basemap-switch .el-button {
+  margin: 0;
+  min-width: 88px;
 }
-#basemap-switch button:last-child { border-bottom: 0; }
-#basemap-switch button.active {
-  background: #2c4a58;
-  color: #fff;
-  font-weight: 650;
-}
-#basemap-switch button:hover:not(.active) { background: #f4f1ea; }
-#basemap-switch button:focus-visible { outline: 2px solid #2c4a58; outline-offset: -2px; }
 
-/* —— 窄屏：地图铺满 #main；面板变底部抽屉 —— */
+/* —— 窄屏：地图铺满 #main；SidePanel.vue 负责底部抽屉 —— */
 @media (max-width: 720px) {
   :root { --header-h: 48px; }
   header.app-head {
@@ -246,38 +209,25 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
     min-height: calc(var(--header-h) + var(--safe-t));
   }
   header h1 { font-size: 14px; line-height: 1.35; }
-  header .sub { display: none; }
   #main { display: block; }
-  /* 地图相对 #main 铺满；不要再 top: header-h（会和文档流顶栏叠出白条） */
   #map { position: absolute; inset: 0; }
-  #panel {
-    position: absolute; left: 0; right: 0; bottom: 0; width: 100%;
-    max-height: 46vh; flex-basis: auto; border-left: 0;
-    border-top: 1px solid var(--line); border-radius: 14px 14px 0 0;
-    box-shadow: 0 -8px 24px rgba(28,42,46,.14);
-    z-index: 2000;
-  }
-  /* 收起时只留握把高度 + 底部安全区 */
-  #panel.collapsed { max-height: calc(44px + var(--safe-b)); overflow: hidden; }
-  #panel-grip {
-    display: flex; height: 44px; flex: 0 0 44px; padding-bottom: var(--safe-b);
-    position: relative; z-index: 2001; pointer-events: auto; touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-  }
-  #panel.collapsed #panel-body { display: none; }
-  #panel-body { padding-bottom: calc(16px + var(--safe-b)); }
   .tile-banner { right: 10px; max-width: none; }
   .leaflet-control-attribution { max-width: calc(100vw - 24px); }
   .leaflet-bottom.leaflet-right { margin-bottom: 50px; }
-}
-@media (max-width: 720px) {
-  /* lift attribution above collapsed bar */
+  /* 版权抬到收起握把上方 */
   .leaflet-bottom { bottom: calc(48px + var(--safe-b)); }
+  #map #basemap-switch {
+    top: 72px;
+    right: 8px;
+    padding: 4px;
+  }
+  #map #basemap-switch .el-button {
+    min-width: 76px;
+    padding: 6px 8px;
+  }
 }
 @media (max-width: 360px) {
   header h1 { font-size: 13px; }
-  .tools button, .chip { padding: 5px 8px; font-size: 11px; }
-  #panel-body { padding: 8px 8px 16px; }
   .place-label { font-size: 10px; max-width: 120px; }
 }
 @media (prefers-reduced-motion: reduce) {

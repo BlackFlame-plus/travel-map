@@ -1,7 +1,7 @@
 # 元旦青岛候选地点地图（Vue3）
 
-Vue 3 + Vite + Leaflet / MapLibre。  
-**改地点只动 JSON**；地图交互逻辑在 `src/lib/map-engine.js`。
+Vue 3 + Vite + **Element Plus** + Leaflet / MapLibre。  
+**改地点只动 JSON**；地图绘制在 `src/lib/map-engine.js`；侧栏/按钮用 Element Plus（PC 右侧栏 + H5 底部抽屉）。
 
 线上预览（若已部署）：https://travel-map-mauve-iota.vercel.app
 
@@ -31,16 +31,22 @@ npm run dev
 
 ```
 src/
-  config/           # 四分 JSON 配置 ← 改数据从这里
-  components/       # Vue 壳子（顶栏、地图容器、侧栏、底图按钮）
-  lib/map-engine.js # 真正的地图逻辑（点、筛选、底图切换）
-  types/place.ts    # 地点字段的 TypeScript 说明
-  assets/styles/    # 全局 CSS 布局
-  App.vue           # 页面骨架：把组件拼在一起
-  main.ts           # 入口
+  config/              # 四分 JSON 配置 ← 改数据从这里
+  components/
+    PanelBody.vue      # 侧栏内容（Element Plus 按钮/搜索/筛选）
+    SidePanel.vue      # PC 右侧栏 + H5 底部抽屉壳
+    BasemapSwitch.vue  # 底图切换
+    …
+  lib/map-engine.js    # 地图点、标签、底图状态机
+  lib/map-bridge.js    # Vue ↔ 引擎 API 桥
+  composables/         # useIsMobile 等（720px 断点）
+  types/place.ts
+  assets/styles/
+  App.vue
+  main.ts              # 注册 Element Plus（中文）
 ```
 
-组件里的 `#panel`、`#search`、`data-cat` 等 **id / data-\*** 被引擎按名字绑定，不要随便改名。
+`#list` / `#detail` / `#doc-guide` 仍由引擎灌 HTML，**不要删这些 id**。筛选/搜索/视图按钮已改由 Vue 调 `getMapApi()`。
 
 ---
 

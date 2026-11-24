@@ -1,21 +1,26 @@
 <script setup lang="ts">
 /**
- * 地图壳组件：只负责提供 #map 容器，并在挂载时启动 / 卸载时销毁引擎。
- * 不要在这里写 Leaflet 逻辑；全部在 ../lib/map-engine.js。
+ * 地图壳：启动引擎、挂到 bridge，并在选中地点时通知 H5 打开侧栏。
  */
-import { onBeforeUnmount, onMounted } from 'vue'
+import { inject, onBeforeUnmount, onMounted } from 'vue'
 import { bootQingdaoMap } from '../lib/map-engine.js'
+import { clearMapApi, setMapApi } from '../lib/map-bridge.js'
 
 let handle: { destroy: () => void } | null = null
+const openSidePanel = inject<() => void>('openSidePanel', () => {})
 
 onMounted(() => {
-  // 启动地图：读 JSON 配置、画点、绑侧栏事件、切底图
-  handle = bootQingdaoMap()
+  handle = bootQingdaoMap({
+    onRequestOpenPanel: () => openSidePanel(),
+  })
+  setMapApi(handle)
+  handle.refreshUi?.()
 })
 
 onBeforeUnmount(() => {
   handle?.destroy()
   handle = null
+  clearMapApi()
 })
 </script>
 

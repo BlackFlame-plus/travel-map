@@ -22,6 +22,7 @@ import places from "../config/places.json";
 import mapMeta from "../config/map-meta.json";
 import offsets from "../config/marker-offsets.json";
 import fallback from "../config/outline-fallback.json";
+import { notifyBasemap } from "./map-bridge.js";
 
 /** 把四分配置合成引擎用的 DATA 对象 */
 function buildData() {
@@ -192,6 +193,8 @@ if (typeof window !== "undefined") {
     if (note) note.style.display = on ? "block" : "none";
   }
   function syncBasemapButtons(name) {
+    /* Vue 底图按钮高亮由 BasemapSwitch 管；这里只通知当前底图 */
+    notifyBasemap(name === OFM_NAME ? "ofm" : "outline");
     var root = $("basemap-switch");
     if (!root) return;
     var btns = root.querySelectorAll("[data-base]");
@@ -199,7 +202,6 @@ if (typeof window !== "undefined") {
       var btn = btns[i];
       var on = (btn.getAttribute("data-base") === "ofm" && name === OFM_NAME) ||
                (btn.getAttribute("data-base") === "outline" && name === OUTLINE_NAME);
-      btn.classList.toggle("active", on);
       btn.setAttribute("aria-pressed", on ? "true" : "false");
     }
   }
@@ -396,21 +398,14 @@ if (typeof window !== "undefined") {
     requestBase(OFM_NAME, "init");
   }
 
-  function onBasemapButtonClick(ev) {
-    var btn = ev.currentTarget;
-    var which = btn && btn.getAttribute("data-base");
+  /** Vue BasemapSwitch 调用：which = "ofm" | "outline" */
+  function setBasemap(which) {
     if (which === "outline") requestBase(OUTLINE_NAME, "user");
-    else if (which === "ofm") requestBase(OFM_NAME, "user");
+    else requestBase(OFM_NAME, "user");
   }
 
-  function bindBasemapSwitch() {
-    var root = $("basemap-switch");
-    if (!root) return;
-    var btns = root.querySelectorAll("[data-base]");
-    for (var i = 0; i < btns.length; i++) {
-      btns[i].addEventListener("click", onBasemapButtonClick);
-    }
-    syncBasemapButtons(wantedBase);
+  function getBasemap() {
+    return wantedBase === OFM_NAME ? "ofm" : "outline";
   }
 
 /* ---------- 底图状态机结束 ---------- */
@@ -836,6 +831,8 @@ if (typeof window !== "undefined") {
     return null;
   }
 
+  var uiHooks = { onRequestOpenPanel: null };
+
   function selectItem(id, fly) {
     var found = findPlace(id);
     if (!found) return;
@@ -843,8 +840,10 @@ if (typeof window !== "undefined") {
     renderList();
     renderDetail(found);
     if (isMobile()) {
-      $("panel").classList.remove("collapsed");
       state.panelOpen = true;
+      if (typeof uiHooks.onRequestOpenPanel === "function") {
+        uiHooks.onRequestOpenPanel();
+      }
     }
     if (fly) {
       if (found.parent.candidates && found.parent.candidates.length && found.item === found.parent) {
@@ -949,51 +948,53 @@ if (typeof window !== "undefined") {
     });
   }
 
-  /** 把 SidePanel 里的固定 DOM 节点绑上事件（依赖那些 id / data-*） */
+  /**
+   * 侧栏控件已迁到 Vue + Element Plus；引擎只保留：
+   * - 窗口尺寸变化时重算地图/标签
+   * - 灌入行程说明 HTML
+   */
   function bindUi() {
-    $("search").addEventListener("input", function (e) {
-      state.query = e.target.value;
-      refreshVisibility();
-    });
-    document.querySelectorAll("[data-cat]").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        var c = btn.getAttribute("data-cat");
-        state.catOn[c] = !state.catOn[c];
-        btn.classList.toggle("active", state.catOn[c]);
-        refreshVisibility();
-      });
-    });
-    $("btn-names").addEventListener("click", function () {
-      state.showNames = !state.showNames;
-      this.classList.toggle("active", state.showNames);
-      layoutLabels();
-    });
-    $("btn-areas").addEventListener("click", function () {
-      state.showAreas = !state.showAreas;
-      this.classList.toggle("active", state.showAreas);
-      layoutLabels();
-    });
     renderDocGuide();
-    document.querySelectorAll("[data-view]").forEach(function (btn) {
-      btn.addEventListener("click", function () { fitView(btn.getAttribute("data-view")); });
-    });
-    $("panel-grip").addEventListener("click", function (e) {
-      L.DomEvent.stop(e);
-      state.panelOpen = !state.panelOpen;
-      $("panel").classList.toggle("collapsed", !state.panelOpen);
-      this.querySelector(".chev").textContent = state.panelOpen ? "收起 ▾" : "展开 ▴";
-      this.setAttribute("aria-expanded", state.panelOpen ? "true" : "false");
-      setTimeout(function () { map.invalidateSize(); layoutLabels(); }, 200);
-    });
-    if (isMobile()) {
-      $("panel").classList.add("collapsed");
-      state.panelOpen = false;
-      $("panel-grip").setAttribute("aria-expanded", "false");
-    }
+    if (isMobile()) state.panelOpen = false;
     window.addEventListener("resize", function () {
       map.invalidateSize();
       layoutLabels();
     });
+  }
+
+  function setQuery(q) {
+    state.query = q || "";
+    refreshVisibility();
+  }
+  function setCategory(cat, on) {
+    if (!Object.prototype.hasOwnProperty.call(state.catOn, cat)) return;
+    state.catOn[cat] = !!on;
+    refreshVisibility();
+  }
+  function setShowNames(on) {
+    state.showNames = !!on;
+    layoutLabels();
+  }
+  function setShowAreas(on) {
+    state.showAreas = !!on;
+    layoutLabels();
+  }
+  function setPanelOpen(open) {
+    state.panelOpen = !!open;
+    setTimeout(function () {
+      if (!map) return;
+      map.invalidateSize();
+      layoutLabels();
+    }, 200);
+  }
+  function refreshUi() {
+    renderDocGuide();
+    renderList();
+    if (state.selected) {
+      var found = findPlace(state.selected);
+      if (found) renderDetail(found);
+    }
+    layoutLabels();
   }
 
   /**
@@ -1049,7 +1050,7 @@ if (typeof window !== "undefined") {
     if (banner) map.getContainer().appendChild(banner);
     var switchEl = $("basemap-switch");
     if (switchEl) map.getContainer().appendChild(switchEl);
-    bindBasemapSwitch();
+    syncBasemapButtons(wantedBase);
 
     map.on("move zoom zoomend moveend viewreset", layoutLabels);
     map.on("click", function () {
@@ -1091,11 +1092,28 @@ if (typeof window !== "undefined") {
 
   /**
    * 对外入口。TravelMap.vue：
-   *   onMounted → bootQingdaoMap()
+   *   onMounted → bootQingdaoMap({ onRequestOpenPanel })
    *   onBeforeUnmount → handle.destroy()
+   *
+   * 返回的 API 供 Vue（Element Plus 侧栏 / 底图按钮）调用，不再手写 DOM 绑定。
    */
-  export function bootQingdaoMap() {
+  export function bootQingdaoMap(options) {
+    options = options || {};
+    uiHooks.onRequestOpenPanel = options.onRequestOpenPanel || null;
     setupMaplibreWorker();
     init();
-    return { destroy: destroy, getMap: function () { return map; } };
+    return {
+      destroy: destroy,
+      getMap: function () { return map; },
+      setQuery: setQuery,
+      setCategory: setCategory,
+      setShowNames: setShowNames,
+      setShowAreas: setShowAreas,
+      fitView: fitView,
+      setPanelOpen: setPanelOpen,
+      setBasemap: setBasemap,
+      getBasemap: getBasemap,
+      selectItem: selectItem,
+      refreshUi: refreshUi
+    };
   }

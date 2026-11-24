@@ -1,10 +1,15 @@
 /**
- * 应用入口：挂载 Vue 根组件，并引入 Leaflet / 全局样式。
- * 地图真正的逻辑在 src/lib/map-engine.js，由 TravelMap.vue 在挂载后启动。
+ * 应用入口：Vue + Element Plus（中文）+ Leaflet / 全局样式。
+ * 地图逻辑在 map-engine；侧栏交互在 Vue 组件里用 Element Plus。
  */
 import { createApp } from 'vue'
+import ElementPlus from 'element-plus'
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
+import 'element-plus/dist/index.css'
 import 'leaflet/dist/leaflet.css'
 import './assets/styles/map.css'
 import App from './App.vue'
 
-createApp(App).mount('#app')
+const app = createApp(App)
+app.use(ElementPlus, { locale: zhCn, size: 'default' })
+app.mount('#app')
