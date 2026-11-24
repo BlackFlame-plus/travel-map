@@ -190,8 +190,6 @@ if (typeof window !== "undefined") {
     } else {
       map.setMaxBounds(null);
     }
-    var note = $("coverage-note");
-    if (note) note.style.display = on ? "block" : "none";
   }
   function syncBasemapButtons(name) {
     /* Vue 底图按钮高亮由 BasemapSwitch 管；这里只通知当前底图 */

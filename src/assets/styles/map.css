@@ -6,7 +6,7 @@
  *     header.app-head     顶栏
  *     #main (横向 flex；窄屏改为块级，地图绝对铺满)
  *       #map
- *       #basemap-switch / #tile-banner / #coverage-note（叠在地图上）
+ *       #basemap-switch / #tile-banner（叠在地图上）
  *       #panel            桌面右侧栏；窄屏底部抽屉
  *
  * 窄屏断点：max-width 720px（与 map-engine isMobile 一致）
@@ -73,22 +73,6 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
 #map {
   flex: 1 1 auto; min-width: 0; min-height: 0; background: #d5d1c8;
   position: relative; z-index: 1; isolation: isolate;
-}
-#coverage-note {
-  display: none;
-  position: absolute;
-  left: 10px;
-  bottom: 28px;
-  z-index: 700;
-  max-width: min(280px, 46vw);
-  padding: 5px 8px;
-  background: rgba(255,253,248,.92);
-  border: 1px dashed #5c5852;
-  border-radius: 4px;
-  font-size: 11px;
-  line-height: 1.35;
-  color: #3a3a38;
-  pointer-events: none;
 }
 /* 区域名层：低于圆点（dotsPane 640），避免盖住目标点 */
 #area-label-layer {

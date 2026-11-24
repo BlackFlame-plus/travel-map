@@ -18,7 +18,6 @@ import TileBanner from './components/TileBanner.vue'
   <div id="main">
     <TravelMap />
     <BasemapSwitch />
-    <div id="coverage-note">虚线框内为已加载的离线陆海；框外是未加载范围，不是海。</div>
     <TileBanner />
     <!-- 引擎挪进 #map：左上角悬浮详情卡 -->
     <div id="detail" class="detail-card" aria-live="polite" />
