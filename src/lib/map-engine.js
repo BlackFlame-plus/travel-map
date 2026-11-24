@@ -1,5 +1,13 @@
 /**
- * Qingdao travel map engine — ported from legacy single-file HTML with minimal behavior changes.
+ * 青岛候选地点地图引擎（从旧版单文件 HTML 迁出，行为尽量不变）。
+ *
+ * 读懂顺序建议：
+ * 1. 本文件顶部的配置 import（places / map-meta / offsets / outline）
+ * 2. state / CATS / PREC_LABEL —— 运行时状态与枚举文案
+ * 3. 分区注释：底图状态机 → 离线轮廓 → 标记点 → 常显标签 → 侧栏列表 → UI 绑定 → init
+ *
+ * 对外只导出 bootQingdaoMap()：由 TravelMap.vue 在 onMounted 调用。
+ * 改地点数据请改 src/config/places.json，说明见 src/config/README.md。
  */
 import L from "leaflet";
 import maplibregl from "maplibre-gl";
@@ -15,21 +23,26 @@ import mapMeta from "../config/map-meta.json";
 import offsets from "../config/marker-offsets.json";
 import fallback from "../config/outline-fallback.json";
 
+/** 把四分配置合成引擎用的 DATA 对象 */
 function buildData() {
   return Object.assign({}, mapMeta, { places: places, fallback: fallback });
 }
 
+/**
+ * MapLibre 需要 Web Worker；单文件/CSP 场景下用 Blob URL 加载内联 worker 源码。
+ * 失败时不影响内置轮廓底图。
+ */
 function setupMaplibreWorker() {
   try {
     if (!maplibregl || typeof maplibregl.setWorkerUrl !== "function") return;
     var blob = new Blob([maplibreWorkerSource], { type: "text/javascript" });
     maplibregl.setWorkerUrl(URL.createObjectURL(blob));
   } catch (err) {
-    /* OFM will fall back to outline */
+    /* OFM 会回退到内置轮廓 */
   }
 }
 
-// Expose for bridge plugin expectations in some builds
+/* 部分桥接/插件期望全局 L / maplibregl */
 if (typeof window !== "undefined") {
   window.maplibregl = maplibregl;
   window.L = L;
@@ -37,12 +50,16 @@ if (typeof window !== "undefined") {
 
 
   var DATA = buildData();
+
+  /** 类型 → 中文名 + 圆点颜色（与侧栏 chip / legend 一致） */
   var CATS = {
     scenic: { label: "景点", color: "#1a7a8c" },
     food: { label: "餐饮", color: "#d26512" },
     bar: { label: "酒馆", color: "#6b3d9c" },
     culture: { label: "文创体验", color: "#2a8a4e" }
   };
+
+  /** precision 字段 → 侧栏徽章文案 */
   var PREC_LABEL = {
     exact: "精确位置",
     approx: "约略位置",
@@ -52,6 +69,10 @@ if (typeof window !== "undefined") {
     pending: "待定位"
   };
 
+  /**
+   * 运行时 UI 状态（不写进 JSON）。
+   * catOn / query 控制哪些点可见；selected 是当前选中的 id。
+   */
   var state = {
     showNames: true,
     showAreas: true,
@@ -65,7 +86,8 @@ if (typeof window !== "undefined") {
   };
 
   var map, layers = {}, fallbackGroup, highlightGroup, labelRoot, svgRoot;
-  var featureIndex = {}; // id -> {place, cand?, latlng, visLatLng, marker, circle}
+  /** id → { place, cand?, latlng, visLatLng, marker, circle } 便于点击/筛选联动 */
+  var featureIndex = {};
 
   function $(id) { return document.getElementById(id); }
 
@@ -73,6 +95,10 @@ if (typeof window !== "undefined") {
     return window.matchMedia("(max-width: 720px)").matches;
   }
 
+  /**
+   * 展开「主点 + 候选点」成统一列表项。
+   * 每项：{ parent: 主地点, item: 实际坐标对象, isCand: 是否候选 }
+   */
   function allMapItems() {
     var out = [];
     DATA.places.forEach(function (p) {
@@ -88,9 +114,10 @@ if (typeof window !== "undefined") {
     return out;
   }
 
-  /* offsets from marker-offsets.json */
-var FIXED_OFFSET = offsets;
+  /* 重合点显示偏移（只影响画点位置，真实中心仍用 lat/lon） */
+  var FIXED_OFFSET = offsets;
 
+  /** 图上显示用的经纬度（可能加了偏移） */
   function visLatLngOf(rec) {
     var it = rec.item;
     var o = FIXED_OFFSET[it.id];
@@ -98,10 +125,12 @@ var FIXED_OFFSET = offsets;
     return L.latLng(it.lat, it.lon);
   }
 
+  /** 真实中心（偏移线的终点） */
   function trueLatLngOf(rec) {
     return L.latLng(rec.item.lat, rec.item.lon);
   }
 
+  /** 当前筛选（类型 + 搜索词）下该点是否显示 */
   function itemVisible(rec) {
     var p = rec.parent;
     var it = rec.item;
@@ -115,6 +144,7 @@ var FIXED_OFFSET = offsets;
     return true;
   }
 
+  /** 地图常显名：优先 item.label → 候选 name → parent.label → name */
   function displayName(rec) {
     var it = rec.item;
     if (it.label) return it.label;
@@ -123,21 +153,10 @@ var FIXED_OFFSET = offsets;
     return it.name;
   }
 
-  /* ---------- map & basemaps ---------- */
-
-  /* Basemap policy (2026-11-24 Asia/Shanghai): official OSM raster tiles
-     returned HTTP 403 rejection images ("Access blocked / App not following
-     tile usage policy"). Those images fire tileload, not tileerror, so the
-     old auto-fallback never ran and filled the map with a rejection wall.
-     Web policy also expects a valid HTTP Referer; a local file page often
-     sends none. We do not bypass the refusal, spoof headers, proxy, retry
-     the refused provider, or switch to OSM.de / other official-OSM mirrors.
-     Esri unauthenticated endpoints and CARTO raster tiles require a
-     registered key per their current docs — not used, not defaulted. */
-  /* ---------- basemap state machine ----------
-     Only OpenFreeMap + offline outline. No Leaflet layers control,
-     no Leaflet base-layer events, no third online raster base. User clicks on #basemap-switch
-     are the only manual driver; default OFM starts once at boot. */
+  /* ========== 底图：只允许 OpenFreeMap 街道图 + 内置离线轮廓 ==========
+     政策说明：OSM.org / OSM.de / OpenTopoMap 官方瓦片曾返回 403 拒绝图，
+     本页不再请求它们，也不用代理/换域绕过。
+     用户点击 #basemap-switch 优先于启动时的默认 OFM 加载（用 switchGen 防竞态）。 */
   var wantedBase = "内置地理轮廓（离线）";
   var OUTLINE_NAME = "内置地理轮廓（离线）";
   var OFM_NAME = "街道图（OpenFreeMap）";
@@ -145,6 +164,7 @@ var FIXED_OFFSET = offsets;
   var OFM_ATTR = '&copy; <a href="https://openfreemap.org/">OpenFreeMap</a> &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
   var ofmLayer = null;
   var ofmAttrOn = false;
+  /** 每次切底图 +1；过期的异步回调看到 gen 不一致就直接放弃 */
   var switchGen = 0;
   var defaultOfmStarted = false;
   var baseAbort = null;
@@ -251,7 +271,10 @@ var FIXED_OFFSET = offsets;
     });
   }
 
-  /* source: "init" runs only via startDefaultOfm; "user" only from the two buttons. */
+  /**
+   * 切换底图。source: "init" = 启动默认；"user" = 用户点按钮。
+   * OFM 未就绪前先显示轮廓；成功后再换成街道图。失败则留在轮廓并提示。
+   */
   function requestBase(name, source) {
     switchGen += 1;
     var gen = switchGen;
@@ -390,9 +413,9 @@ var FIXED_OFFSET = offsets;
     syncBasemapButtons(wantedBase);
   }
 
-/* ---------- end basemap state machine ---------- */
+/* ---------- 底图状态机结束 ---------- */
 
-
+  /* ========== 离线轮廓样式（道路颜色/线宽/按缩放显隐）========== */
   var QD_OUTLINE_RENDER = {
     landPane: "outlinePane",
     landPaneZ: 350,
@@ -412,6 +435,7 @@ var FIXED_OFFSET = offsets;
   };
   if (typeof window !== "undefined") window.QD_OUTLINE_RENDER = QD_OUTLINE_RENDER;
 
+  /** 按当前缩放级别显示/隐藏不同等级的路网图层 */
   function syncOutlineZoom() {
     if (!map || !fallbackGroup) return;
     var z = map.getZoom();
@@ -422,6 +446,7 @@ var FIXED_OFFSET = offsets;
     });
   }
 
+  /** 从 outline-fallback.json 生成 Leaflet 图层组（陆地/水/海岸/路/铁路） */
   function buildFallback() {
     outlineZoomGroups = [];
     var g = L.layerGroup();
@@ -502,6 +527,7 @@ var FIXED_OFFSET = offsets;
     return g;
   }
 
+  /** 从 map-meta.highlights 画强调线（如特定步行路线） */
   function buildHighlights() {
     var g = L.layerGroup();
     var h = DATA.highlights || {};
@@ -525,11 +551,12 @@ var FIXED_OFFSET = offsets;
     return g;
   }
 
-  /* ---------- markers ---------- */
+  /* ========== 标记点（圆点 / 约略虚线圈 / 偏移指引线）========== */
   function colorOf(rec) {
     return (CATS[rec.parent.category] || CATS.scenic).color;
   }
 
+  /** 遍历 allMapItems，创建圆点并写入 featureIndex */
   function addMarkers() {
     layers.markers = L.layerGroup().addTo(map);
     layers.ranges = L.layerGroup().addTo(map);
@@ -590,6 +617,7 @@ var FIXED_OFFSET = offsets;
   }
 
 
+  /** 按筛选结果显示/隐藏标记，并刷新标签与列表 */
   function refreshVisibility() {
     Object.keys(featureIndex).forEach(function (id) {
       var rec = featureIndex[id];
@@ -612,7 +640,7 @@ var FIXED_OFFSET = offsets;
     layoutLabels();
   }
 
-  /* ---------- labels ---------- */
+  /* ========== 常显文字标签（地点名 + 区域名，带简单避让）========== */
   function layoutLabels() {
     labelRoot.innerHTML = "";
     svgRoot.innerHTML = "";
@@ -740,7 +768,7 @@ var FIXED_OFFSET = offsets;
     });
   }
 
-  /* ---------- list & detail ---------- */
+  /* ========== 侧栏清单与详情 ========== */
   function precBadge(prec) {
     if (prec === "exact") return '<span class="badge exact">精确</span>';
     if (prec === "candidate") return '<span class="badge cand">候选</span>';
@@ -906,7 +934,8 @@ var FIXED_OFFSET = offsets;
     el.innerHTML = html;
   }
 
-  /* ---------- views / ui ---------- */
+  /* ========== 视图按钮 / 搜索 / 类型筛选 / 面板展开 ========== */
+  /** key 对应 map-meta.json 的 views.play / urban / … */
   function fitView(key, opts) {
     var v = DATA.views[key];
     if (!v) return;
@@ -920,6 +949,7 @@ var FIXED_OFFSET = offsets;
     });
   }
 
+  /** 把 SidePanel 里的固定 DOM 节点绑上事件（依赖那些 id / data-*） */
   function bindUi() {
     $("search").addEventListener("input", function (e) {
       state.query = e.target.value;
@@ -966,6 +996,10 @@ var FIXED_OFFSET = offsets;
     });
   }
 
+  /**
+   * 启动顺序：
+   * 建图 → 离线轮廓 → 尝试 OFM → 画高亮/点/标签 → 绑 UI → 默认视野 play → 默认加载街道图
+   */
   function init() {
     L.Icon.Default.mergeOptions({
       iconUrl: leafletIcon,
@@ -1044,6 +1078,7 @@ var FIXED_OFFSET = offsets;
     }, 300);
   }
 
+  /** Vue 卸载时调用，释放 Leaflet 实例 */
   function destroy() {
     try {
       if (map) {
@@ -1054,6 +1089,11 @@ var FIXED_OFFSET = offsets;
     } catch (e) { /* ignore */ }
   }
 
+  /**
+   * 对外入口。TravelMap.vue：
+   *   onMounted → bootQingdaoMap()
+   *   onBeforeUnmount → handle.destroy()
+   */
   export function bootQingdaoMap() {
     setupMaplibreWorker();
     init();

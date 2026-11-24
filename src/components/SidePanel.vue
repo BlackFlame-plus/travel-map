@@ -1,3 +1,16 @@
+<!--
+  侧栏 / 移动端底部抽屉「地点与说明」。
+
+  重要：下面这些 id 和 data-* 被 map-engine.js 用 getElementById / querySelector 绑定，
+  改名会导致筛选、搜索、视图切换全部失效。
+
+  - #panel / #panel-grip / #panel-body  面板壳与展开收起
+  - [data-view]                         视图按钮（play/urban/… 对应 map-meta.views）
+  - #btn-names / #btn-areas             地点名 / 区域名开关
+  - #search                             搜索框
+  - [data-cat]                          类型筛选（scenic/food/bar/culture）
+  - #doc-guide / #list / #detail        由引擎动态填 HTML
+-->
 <template>
   <aside id="panel">
     <button type="button" id="panel-grip" aria-expanded="false">

@@ -1,21 +1,33 @@
-/* Qingdao travel map — H5 + PC */
+/**
+ * 青岛地图全局样式（H5 + PC）
+ *
+ * 布局结构：
+ *   #app (竖向 flex)
+ *     header.app-head     顶栏
+ *     #main (横向 flex；窄屏改为块级，地图绝对铺满)
+ *       #map
+ *       #basemap-switch / #tile-banner / #coverage-note（叠在地图上）
+ *       #panel            桌面右侧栏；窄屏底部抽屉
+ *
+ * 窄屏断点：max-width 720px（与 map-engine isMobile 一致）
+ */
 :root {
-  --bg: #f4f1ea;
-  --panel: #fffdf8;
-  --ink: #1c2a2e;
-  --muted: #5a686c;
-  --line: #d8d0c4;
-  --accent: #1a6f7a;
-  --scenic: #1a7a8c;
-  --food: #d26512;
-  --bar: #6b3d9c;
-  --culture: #2a8a4e;
+  --bg: #f4f1ea;           /* 页面底色 */
+  --panel: #fffdf8;        /* 侧栏底色 */
+  --ink: #1c2a2e;          /* 主文字 */
+  --muted: #5a686c;        /* 次要文字 */
+  --line: #d8d0c4;         /* 分隔线 */
+  --accent: #1a6f7a;       /* 强调色（按钮 active） */
+  --scenic: #1a7a8c;       /* 景点 */
+  --food: #d26512;         /* 餐饮 */
+  --bar: #6b3d9c;          /* 酒馆 */
+  --culture: #2a8a4e;      /* 文创 */
   --approx: #8a6a1a;
   --danger: #8a2f2f;
   --shadow: 0 8px 28px rgba(28, 42, 46, .14);
-  --header-h: 52px;
-  --safe-t: env(safe-area-inset-top, 0px);
-  --safe-b: env(safe-area-inset-bottom, 0px);
+  --header-h: 52px;        /* 顶栏内容区最小高度（不含 safe-area） */
+  --safe-t: env(safe-area-inset-top, 0px);    /* 刘海/状态栏 */
+  --safe-b: env(safe-area-inset-bottom, 0px); /* Home 指示条 */
   --font: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Source Han Sans SC",
           "Microsoft YaHei", "WenQuanYi Micro Hei", system-ui, sans-serif;
 }
@@ -27,6 +39,7 @@ html, body {
   -webkit-text-size-adjust: 100%;
 }
 #app { display: flex; flex-direction: column; height: 100%; width: 100%; max-width: 100vw; overflow: hidden; }
+/* 顶栏：padding-top 含 safe-area，避免微信内置浏览器里标题贴顶 */
 header.app-head {
   flex: 0 0 auto;
   min-height: var(--header-h);
@@ -225,9 +238,9 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
 #basemap-switch button:hover:not(.active) { background: #f4f1ea; }
 #basemap-switch button:focus-visible { outline: 2px solid #2c4a58; outline-offset: -2px; }
 
+/* —— 窄屏：地图铺满 #main；面板变底部抽屉 —— */
 @media (max-width: 720px) {
   :root { --header-h: 48px; }
-  /* WeChat / in-app browser: keep title from sitting flush under chrome */
   header.app-head {
     padding: calc(12px + var(--safe-t)) 10px 12px;
     min-height: calc(var(--header-h) + var(--safe-t));
@@ -235,6 +248,7 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
   header h1 { font-size: 14px; line-height: 1.35; }
   header .sub { display: none; }
   #main { display: block; }
+  /* 地图相对 #main 铺满；不要再 top: header-h（会和文档流顶栏叠出白条） */
   #map { position: absolute; inset: 0; }
   #panel {
     position: absolute; left: 0; right: 0; bottom: 0; width: 100%;
@@ -243,6 +257,7 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
     box-shadow: 0 -8px 24px rgba(28,42,46,.14);
     z-index: 2000;
   }
+  /* 收起时只留握把高度 + 底部安全区 */
   #panel.collapsed { max-height: calc(44px + var(--safe-b)); overflow: hidden; }
   #panel-grip {
     display: flex; height: 44px; flex: 0 0 44px; padding-bottom: var(--safe-b);
@@ -254,7 +269,6 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
   .tile-banner { right: 10px; max-width: none; }
   .leaflet-control-attribution { max-width: calc(100vw - 24px); }
   .leaflet-bottom.leaflet-right { margin-bottom: 50px; }
-  #panel:not(.collapsed) ~ /* no */ .x { }
 }
 @media (max-width: 720px) {
   /* lift attribution above collapsed bar */

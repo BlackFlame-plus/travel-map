@@ -1,3 +1,14 @@
+/**
+ * 校验 places.json 是否还能被地图引擎正常吃进去。
+ *
+ * 检查项：
+ * - 正好 94 条主地点（若你故意增删，改下面的期望数量）
+ * - id 全局唯一（含 candidates）
+ * - category / precision 落在允许枚举内
+ * - 非 pending、且未 hideDot 的点必须有 lat/lon
+ *
+ * 用法：npm run validate:places
+ */
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
