@@ -102,10 +102,8 @@
           "primaryPlaceIds": [
             "14"
           ],
-          "optionalPlaceIds": [
-            "45"
-          ],
-          "notes": "预算 50 分钟。Good 咖啡（45）仅偶遇替换，不专门找门牌。"
+          "optionalPlaceIds": [],
+          "notes": "预算 50 分钟。不强求走到桥端。"
         },
         {
           "id": "d1-08-lunch",
@@ -114,13 +112,11 @@
           "primaryPlaceIds": [
             "76-zhanqiao"
           ],
-          "optionalPlaceIds": [
-            "82-hb"
-          ],
-          "notes": "预算 60 分钟。仅 76-zhanqiao；近备选 82-hb，只择一家。",
+          "optionalPlaceIds": [],
+          "notes": "预算 60 分钟。仅 76-zhanqiao。若排队过久，在附近步行范围内另选已营业简餐，不点名具体店。",
           "meal": {
             "kind": "lunch",
-            "note": "候选主选 76-zhanqiao；营业/空位未实时核实。"
+            "note": "候选主选 76-zhanqiao；营业/空位未实时核实。排队则就近另选已营业简餐，不编造店名。"
           }
         },
         {
