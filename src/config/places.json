@@ -1581,16 +1581,16 @@
     "category": "food",
     "precision": "candidate",
     "hideDot": true,
-    "note": "【用户文档】备注「生蚝捞饭」。\n【2026-11-24 核验】品牌「33号大院·青岛本帮菜」。栈桥店：市南区湖南路33号（近栈桥，店名与门牌相符）。极地店：崂山区东海东路60号极地海洋世界院内。文档未指定，两处都标成候选。生蚝捞饭为文档提供、未实时核实。",
-    "source": "携程 栈桥店、极地店；高德/360 条目（只用地址文字，不用其坐标）。核验日期 2026-11-24。OSM 湖南路、青岛极地海洋公园 WGS84。",
-    "searchQuery": "33号大院 青岛本帮菜",
+    "note": "【用户文档】备注「生蚝捞饭」。\n【2026-11-24 核验】品牌「33号大院·青岛本帮菜」。按用户确认只保留栈桥店：市南区湖南路33号（近栈桥，店名与门牌相符）。生蚝捞饭为文档提供、未实时核实。",
+    "source": "携程栈桥店；高德/360 条目（只用地址文字，不用其坐标）。核验日期 2026-11-24。OSM 湖南路 WGS84。",
+    "searchQuery": "33号大院 青岛本帮菜 湖南路",
     "status": "doc",
-    "searchLink": "https://www.openstreetmap.org/search?query=33%E5%8F%B7%E5%A4%A7%E9%99%A2%20%E9%9D%92%E5%B2%9B",
+    "searchLink": "https://www.openstreetmap.org/search?query=33%E5%8F%B7%E5%A4%A7%E9%99%A2%20%E6%B9%96%E5%8D%97%E8%B7%AF%20%E9%9D%92%E5%B2%9B",
     "foodKind": "restaurant",
     "docSection": "饭店",
     "verifiedDate": "2026-11-24",
     "verifyStatus": "range",
-    "address": "至少有栈桥店与极地店，文档未指定",
+    "address": "市南区湖南路33号（栈桥店）",
     "candidates": [
       {
         "id": "76-zhanqiao",
@@ -1603,18 +1603,6 @@
         "note": "候选。针点为近栈桥的湖南路路段，不是33号门牌实测。",
         "source": "携程栈桥店；OSM 湖南路 WGS84",
         "osmLink": "https://www.openstreetmap.org/?mlat=36.064320&mlon=120.315180#map=16/36.06432/120.31518"
-      },
-      {
-        "id": "76-jidi",
-        "name": "33号大院·极地店（候选）",
-        "lat": 36.0686053,
-        "lon": 120.4371721,
-        "precision": "area-ref",
-        "radiusM": 120,
-        "address": "崂山区东海东路60号极地海洋世界院内",
-        "note": "候选。针点为已核实极地海洋公园，是园区参考，不是店门口。",
-        "source": "携程极地店；OSM 极地海洋公园 WGS84",
-        "osmLink": "https://www.openstreetmap.org/?mlat=36.068605&mlon=120.437172#map=16/36.06861/120.43717"
       }
     ]
   },
