@@ -148,15 +148,15 @@ defineExpose({ openPanel, closePanel, panelOpen })
   box-shadow: 0 8px 24px rgba(28, 42, 46, 0.18);
 }
 
-/* 只占底部 ~55%，不盖住地图上半部分，因此地图仍可拖 */
+/* 底部约七成高度；上方仍留地图可拖 */
 .h5-sheet {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
   z-index: 2000;
-  height: min(55vh, 520px);
-  max-height: calc(100% - 72px);
+  height: min(72vh, 680px);
+  max-height: calc(100% - 56px);
   display: flex;
   flex-direction: column;
   min-height: 0;

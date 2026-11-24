@@ -721,7 +721,7 @@ if (typeof window !== "undefined") {
       /* H5：展开时是底部半屏 #h5-sheet；收起时只有悬浮按钮 */
       var sheet = $("h5-sheet");
       if (state.panelOpen && sheet) {
-        padBottom = (sheet.offsetHeight || Math.round(window.innerHeight * 0.55)) + 8;
+        padBottom = (sheet.offsetHeight || Math.round(window.innerHeight * 0.72)) + 8;
       } else {
         padBottom = 64 + 8;
       }

@@ -335,9 +335,12 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
     min-width: 76px;
     padding: 6px 8px;
   }
+  /* H5：双指缩放即可，隐藏 +/- */
+  #map .leaflet-control-zoom {
+    display: none !important;
+  }
   #map .leaflet-top.leaflet-right {
-    top: 156px;
-    right: 8px;
+    display: none;
   }
   /* H5：同样贴左上，避开右侧底图切换与底部握把 */
   #map #detail.open {
