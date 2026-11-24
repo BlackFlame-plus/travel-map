@@ -56,6 +56,7 @@ if (typeof window !== "undefined") {
   var CATS = {
     scenic: { label: "景点", color: "#1a7a8c" },
     food: { label: "餐饮", color: "#d26512" },
+    coffee: { label: "咖啡", color: "#8b5a2b" },
     bar: { label: "酒馆", color: "#6b3d9c" },
     culture: { label: "文创体验", color: "#2a8a4e" }
   };
@@ -77,7 +78,7 @@ if (typeof window !== "undefined") {
   var state = {
     showNames: true,
     showAreas: true,
-    catOn: { scenic: true, food: true, bar: true, culture: true },
+    catOn: { scenic: true, food: true, coffee: true, bar: true, culture: true },
     query: "",
     selected: null,
     tilesOk: false,
@@ -858,14 +859,14 @@ if (typeof window !== "undefined") {
       wasOpen[d.getAttribute("data-cat")] = d.open;
     });
 
-    var groups = { scenic: [], food: [], bar: [], culture: [] };
+    var groups = { scenic: [], food: [], coffee: [], bar: [], culture: [] };
     DATA.places.forEach(function (p) {
       if (!placePassesListFilter(p)) return;
       if (groups[p.category]) groups[p.category].push(p);
     });
 
     var html = "";
-    var catOrder = ["scenic", "food", "bar", "culture"];
+    var catOrder = ["scenic", "food", "coffee", "bar", "culture"];
     catOrder.forEach(function (cat) {
       var items = groups[cat];
       if (!items.length) return;

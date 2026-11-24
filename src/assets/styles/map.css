@@ -20,6 +20,7 @@
   --accent: #1a6f7a;       /* 强调色（按钮 active） */
   --scenic: #1a7a8c;       /* 景点 */
   --food: #d26512;         /* 餐饮 */
+  --coffee: #8b5a2b;       /* 咖啡（从餐饮拆出） */
   --bar: #6b3d9c;          /* 酒馆 */
   --culture: #2a8a4e;      /* 文创 */
   --approx: #8a6a1a;
@@ -128,6 +129,7 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
 }
 .swatch.scenic { background: var(--scenic); color: var(--scenic); }
 .swatch.food { background: var(--food); color: var(--food); }
+.swatch.coffee { background: var(--coffee); color: var(--coffee); }
 .swatch.bar { background: var(--bar); color: var(--bar); }
 .swatch.culture { background: var(--culture); color: var(--culture); }
 .hint, .note-box, .tile-banner {

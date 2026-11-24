@@ -10,6 +10,7 @@ import { getMapApi } from '../lib/map-bridge.js'
 const CATS = [
   { key: 'scenic', label: '景点' },
   { key: 'food', label: '餐饮' },
+  { key: 'coffee', label: '咖啡' },
   { key: 'bar', label: '酒馆' },
   { key: 'culture', label: '文创体验' },
 ] as const
@@ -20,6 +21,7 @@ const showAreas = ref(true)
 const catOn = reactive({
   scenic: true,
   food: true,
+  coffee: true,
   bar: true,
   culture: true,
 })
@@ -110,6 +112,7 @@ onMounted(() => {
     <div class="legend">
       <span><i class="swatch scenic" />景点（青/蓝）</span>
       <span><i class="swatch food" />餐饮（橙）</span>
+      <span><i class="swatch coffee" />咖啡（棕）</span>
       <span><i class="swatch bar" />酒馆（紫）</span>
       <span><i class="swatch culture" />文创体验（绿）</span>
     </div>

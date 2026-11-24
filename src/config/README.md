@@ -45,7 +45,7 @@ npm run validate:places
 | `id` | 全局唯一 ID（字符串）。候选点子项也要唯一。 |
 | `num` | 清单里显示的编号（可与 id 相同，也可如 `1a`）。 |
 | `name` | 地点名称。 |
-| `category` | 类型，只能是下面四个之一。 |
+| `category` | 类型，只能是下面五个之一。 |
 | `status` | 来源标记：`named` 名单内 / `alt` 备选 / `doc` 文档补入。 |
 | `precision` | 坐标精度，影响点和徽章样式。 |
 
@@ -55,6 +55,7 @@ npm run validate:places
 |----|------|----------|
 | `scenic` | 景点 | 青蓝 |
 | `food` | 餐饮 | 橙 |
+| `coffee` | 咖啡 | 棕 |
 | `bar` | 酒馆 | 紫 |
 | `culture` | 文创体验 | 绿 |
 

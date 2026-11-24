@@ -16,7 +16,7 @@ import { dirname, join } from 'node:path'
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const places = JSON.parse(readFileSync(join(root, 'src/config/places.json'), 'utf8'))
 
-const CATS = new Set(['scenic', 'food', 'bar', 'culture'])
+const CATS = new Set(['scenic', 'food', 'coffee', 'bar', 'culture'])
 const PREC = new Set(['exact', 'approx', 'area', 'area-ref', 'candidate', 'pending'])
 const ids = new Set()
 let errors = 0

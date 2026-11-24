@@ -4,7 +4,7 @@
  */
 
 /** 地点大类 → 图上颜色（见 map-engine 里的 CATS） */
-export type PlaceCategory = 'scenic' | 'food' | 'bar' | 'culture'
+export type PlaceCategory = 'scenic' | 'food' | 'coffee' | 'bar' | 'culture'
 
 /** 名单来源：正式名单 / 备选 / 从用户文档补入 */
 export type PlaceStatus = 'named' | 'alt' | 'doc'
