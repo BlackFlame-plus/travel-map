@@ -92,9 +92,8 @@ defineExpose({ openPanel, closePanel, panelOpen })
       :show-close="false"
       :append-to-body="true"
       :destroy-on-close="false"
-      :close-on-click-modal="true"
+      :modal="false"
       :z-index="3000"
-      modal-class="h5-place-drawer-modal"
     >
       <template #header>
         <div class="h5-drawer-head">
@@ -179,7 +178,14 @@ defineExpose({ openPanel, closePanel, panelOpen })
   -webkit-overflow-scrolling: touch;
   background: var(--panel, #fffdf8);
 }
-.h5-place-drawer-modal {
-  background: rgba(28, 42, 46, 0.28) !important;
+/* 无 mask：全屏容器不拦事件，只有抽屉本体可点；地图可继续拖 */
+body .el-overlay-dialog:has(.h5-place-drawer),
+body .el-drawer__container:has(.h5-place-drawer) {
+  pointer-events: none !important;
+  background: transparent !important;
+}
+.h5-place-drawer.el-drawer {
+  box-shadow: 0 -10px 28px rgba(28, 42, 46, 0.18);
+  pointer-events: auto !important;
 }
 </style>
