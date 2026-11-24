@@ -116,7 +116,7 @@ npm run validate:trip-plan
 
 ### 日结构约定（已与用户确认）
 
-- 默认 **恰好 3 个完整游览日**：`day1` / `day2` / `day3`，`date: null`（时间住宿未定，不绑节假日）。
+- 默认 **恰好 4 个完整游览日**：`day1` / `day2` / `day3` / `day4`，`date: null`（时间住宿未定，不绑节假日）。
 - **不要**加 Day0 / Day4 假装抵达/返程游玩日。
 - 现行内容见 `trip-plan.json`（`contentStatus: draft`）与说明 `trip-plan.notes.md`。
 - 陈记食集 `placeId: "10"` 只进 `exclusions`，不删 places。
@@ -178,8 +178,8 @@ npm run validate:trip-plan
 | `exclusions[]` | object | 否 | 计划排除（不删主数据） |
 | `exclusions[].placeId` | string | 是* | places/candidates 全局 id |
 | `exclusions[].reason` | string | 是* | 排除原因 |
-| `days[]` | object | 是 | 游览日列表（默认 3 天） |
-| `days[].id` | string | 是 | 唯一，建议 `day1`/`day2`/`day3` |
+| `days[]` | object | 是 | 游览日列表（默认 4 天） |
+| `days[].id` | string | 是 | 唯一，建议 `day1`/`day2`/`day3`/`day4` |
 | `days[].label` | string | 是 | UI 按钮文案，如 `Day 1` |
 | `days[].date` | string\|null | 否 | `YYYY-MM-DD` 或 **`null`（当前约定）** |
 | `days[].summary` | string\|null | 否 | 当日一句话主题 |

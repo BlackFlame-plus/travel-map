@@ -48,9 +48,8 @@ function pickDay(id: string) {
 
 /** 按钮用短标签，完整主题留在侧栏 summary */
 function dayBtnText(d: DayBrief) {
-  if (d.id === 'day1') return 'Day 1'
-  if (d.id === 'day2') return 'Day 2'
-  if (d.id === 'day3') return 'Day 3'
+  const m = /^day(\d+)$/i.exec(d.id)
+  if (m) return `Day ${m[1]}`
   return d.label
 }
 
