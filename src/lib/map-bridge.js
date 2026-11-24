@@ -4,6 +4,7 @@
  */
 let api = null
 let basemapHandler = null
+let panelCloseHandler = null
 
 export function setMapApi(next) {
   api = next
@@ -24,4 +25,13 @@ export function setBasemapHandler(fn) {
 
 export function notifyBasemap(which) {
   if (typeof basemapHandler === 'function') basemapHandler(which)
+}
+
+/** SidePanel 注册：H5 从清单点选地点后收起底部菜单 */
+export function setPanelCloseHandler(fn) {
+  panelCloseHandler = fn
+}
+
+export function notifyPanelClose() {
+  if (typeof panelCloseHandler === 'function') panelCloseHandler()
 }

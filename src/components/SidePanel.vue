@@ -5,11 +5,11 @@
  *
  * PC / H5 互斥挂载，保证 PanelBody（#list）同一时间只有一份。
  */
-import { nextTick, ref, watch } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { ArrowDown, ArrowUp } from '@element-plus/icons-vue'
 import PanelBody from './PanelBody.vue'
 import { useIsMobile } from '../composables/useBreakpoint'
-import { getMapApi } from '../lib/map-bridge.js'
+import { getMapApi, setPanelCloseHandler } from '../lib/map-bridge.js'
 
 const { isMobile } = useIsMobile()
 /** 仅 H5 使用；PC 始终可视 */
@@ -27,6 +27,16 @@ function openPanel() {
 function closePanel() {
   panelOpen.value = false
 }
+
+onMounted(() => {
+  setPanelCloseHandler(() => {
+    if (isMobile.value) closePanel()
+  })
+})
+
+onBeforeUnmount(() => {
+  setPanelCloseHandler(null)
+})
 
 watch(
   isMobile,

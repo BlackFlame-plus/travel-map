@@ -22,7 +22,7 @@ import places from "../config/places.json";
 import mapMeta from "../config/map-meta.json";
 import offsets from "../config/marker-offsets.json";
 import fallback from "../config/outline-fallback.json";
-import { notifyBasemap } from "./map-bridge.js";
+import { notifyBasemap, notifyPanelClose } from "./map-bridge.js";
 
 /** 把四分配置合成引擎用的 DATA 对象 */
 function buildData() {
@@ -889,7 +889,9 @@ if (typeof window !== "undefined") {
     if (!html) html = '<p class="hint">没有符合当前筛选的地点。</p>';
     box.innerHTML = html;
     box.querySelectorAll(".item").forEach(function (el) {
-      el.addEventListener("click", function () { selectItem(el.getAttribute("data-id"), true); });
+      el.addEventListener("click", function () {
+        selectItem(el.getAttribute("data-id"), true, true);
+      });
     });
   }
 
@@ -911,7 +913,12 @@ if (typeof window !== "undefined") {
     return null;
   }
 
-  function selectItem(id, fly) {
+  /**
+   * @param {string} id
+   * @param {boolean} fly 是否飞到地点
+   * @param {boolean} [fromList] 是否来自侧栏/底部清单（H5 下会收起菜单）
+   */
+  function selectItem(id, fly, fromList) {
     var found = findPlace(id);
     if (!found) return;
     state.selected = id;
@@ -928,6 +935,11 @@ if (typeof window !== "undefined") {
         var z = Math.max(map.getZoom(), found.item.precision === "exact" ? 16 : 15);
         map.setView(ll, z, { animate: true });
       }
+    }
+    /* H5：从菜单点选后收起底部面板，方便看地图与详情卡 */
+    if (fromList && isMobile()) {
+      state.panelOpen = false;
+      notifyPanelClose();
     }
     layoutLabels();
   }
