@@ -14,6 +14,7 @@
   --danger: #8a2f2f;
   --shadow: 0 8px 28px rgba(28, 42, 46, .14);
   --header-h: 52px;
+  --safe-t: env(safe-area-inset-top, 0px);
   --safe-b: env(safe-area-inset-bottom, 0px);
   --font: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Source Han Sans SC",
           "Microsoft YaHei", "WenQuanYi Micro Hei", system-ui, sans-serif;
@@ -27,9 +28,12 @@ html, body {
 }
 #app { display: flex; flex-direction: column; height: 100%; width: 100%; max-width: 100vw; overflow: hidden; }
 header.app-head {
-  flex: 0 0 var(--header-h); height: var(--header-h);
+  flex: 0 0 auto;
+  min-height: var(--header-h);
+  height: auto;
   display: flex; align-items: center; gap: 10px;
-  padding: 0 12px; border-bottom: 1px solid var(--line);
+  padding: calc(10px + var(--safe-t)) 12px 10px;
+  border-bottom: 1px solid var(--line);
   background: #fff; z-index: 20;
 }
 header h1 {
@@ -223,8 +227,12 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
 
 @media (max-width: 720px) {
   :root { --header-h: 48px; }
-  header.app-head { padding: 0 10px; }
-  header h1 { font-size: 14px; }
+  /* WeChat / in-app browser: keep title from sitting flush under chrome */
+  header.app-head {
+    padding: calc(12px + var(--safe-t)) 10px 12px;
+    min-height: calc(var(--header-h) + var(--safe-t));
+  }
+  header h1 { font-size: 14px; line-height: 1.35; }
   header .sub { display: none; }
   #main { display: block; }
   #map { position: absolute; inset: 0; }
