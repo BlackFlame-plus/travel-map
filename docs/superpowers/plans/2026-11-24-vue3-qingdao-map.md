@@ -218,10 +218,25 @@ qingdao-travel-map/          # 或仓库根（若整仓就是本项目）
 
 ---
 
-## 建议你怎么瞅
+## 已拍板（2026-11-24 Asia/Shanghai）
 
-1. 是否同意 **配置三（四）分**：`places` / `map-meta` / `offsets` / `outline-fallback`？  
-2. GitHub 是 **新空仓库** 还是挂到已有 repo？URL 可下一回合给。  
-3. 是否还要 **build 出单 HTML**？要的话加 Task 10，不要则到 Task 9 结束。
+1. **配置四分**：`places` / `map-meta` / `marker-offsets` / `outline-fallback` — 同意。  
+2. **GitHub**：新建仓库（目标名暂定 `qingdao-travel-map`，owner 以已连接 GitHub 账号为准）。  
+3. **单文件**：要。增加 Task 10（`vite-plugin-singlefile` 或等价方案），`npm run build` 产出可下载的单 HTML，行为与现网对等。
 
-你点头后按 Task 1 → 9 做；若只想先要「能改 JSON」，做到 Task 2/3 就可以停一版给你用。
+按 Task 1 → 10 执行。
+
+---
+
+## Task 10: 单文件构建
+
+**Goal:** `dist/index.html`（或 `qingdao-travel-map.html`）一份即可打开/托管，内联 JS/CSS；轮廓 JSON 需打进包或可接受同目录旁路时在 README 写明。
+
+**Files:**
+- Modify: `vite.config.ts`, `package.json`
+- Create/Update: README 单文件用法
+
+- [ ] 接入 `vite-plugin-singlefile`（或经评估的替代）；`outline-fallback` 用 import 进 bundle，避免运行时再 fetch 旁路文件（保证真·单文件）。
+- [ ] `npm run build` 得到单 HTML；用静态服打开做 Task 1 清单回归。
+- [ ] 将产物复制到 `/opt/cursor/artifacts/qingdao-travel-map-vue-single.html` 便于下载。
+- [ ] Commit：`build: emit single-file HTML bundle`

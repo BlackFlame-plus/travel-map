@@ -1,20 +1,44 @@
-# 元旦青岛候选地点地图（单文件）
+# 元旦青岛候选地点地图（Vue3）
 
-可离线打开的 Leaflet 旅行候选地点地图（WGS84）。默认尝试 OpenFreeMap 街道图，失败或手动切换时使用内置地理轮廓。
+Vue 3 + Vite + Leaflet / MapLibre。地点与展示属性在 JSON 配置里改；`npm run build` 产出**单文件** `dist/index.html`。
 
-## 运行
+## 配置（四分）
 
-用任意静态服务器打开仓库中的 `qingdao-travel-map.html`，或直接用浏览器打开该文件。
+| 文件 | 用途 |
+|------|------|
+| `src/config/places.json` | 地点列表（日常主要改这个） |
+| `src/config/map-meta.json` | 视图、区域名、高亮线、文档说明 |
+| `src/config/marker-offsets.json` | 重合点视觉偏移 |
+| `src/config/outline-fallback.json` | 内置离线轮廓几何（很少改） |
 
-示例：
+改完地点后建议：
 
 ```bash
-python3 -m http.server 43145 --bind 127.0.0.1
-# 然后访问 http://127.0.0.1:43145/qingdao-travel-map.html
+npm run validate:places
 ```
 
-修好的可下载副本也在：`/opt/cursor/artifacts/qingdao-travel-map-mobile-fixed.html`。
+## 开发
 
-## 移动端白条修复
+```bash
+npm install
+npm run dev          # http://127.0.0.1:43146
+```
 
-在 `max-width: 720px` 下，`header` 已在文档流中占高，`#map` 相对 `#main` 再设 `top: var(--header-h)` 会造成标题与地图之间双倍留白。已改为 `#map { position: absolute; inset: 0; }`（桌面布局不变）。
+## 单文件构建
+
+```bash
+npm run build        # → dist/index.html（JS/CSS 已内联）
+npm run preview      # http://127.0.0.1:43147
+```
+
+也可用任意静态服务器打开 `dist/index.html`，或直接用浏览器打开该文件（OpenFreeMap 需联网；内置轮廓可离线）。
+
+## 结构
+
+- `src/components/*`：页头、地图壳、底图切换、侧栏等
+- `src/lib/map-engine.js`：地图行为（从原单文件迁入，保持筛选/底图竞态等逻辑）
+- `legacy/qingdao-travel-map.html`：迁移前单文件基线
+
+## 底图说明
+
+默认尝试 OpenFreeMap 街道图；可切换「内置轮廓」。不请求 OSM.org / OSM.de / OpenTopoMap 官方瓦片。

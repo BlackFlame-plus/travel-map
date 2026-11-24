@@ -1,0 +1,411 @@
+{
+  "generated": "2026-11-18",
+  "crs": "WGS84 (EPSG:4326)",
+  "areaLabels": [
+    {
+      "name": "市南区",
+      "lat": 36.0758752,
+      "lon": 120.4056631,
+      "kind": "district",
+      "minZ": 11,
+      "maxZ": 14,
+      "source": "OSM 市南区行政关系（WGS84）"
+    },
+    {
+      "name": "市北区",
+      "lat": 36.0873176,
+      "lon": 120.3696639,
+      "kind": "district",
+      "minZ": 11,
+      "maxZ": 14,
+      "source": "OSM 市北区行政关系（WGS84）"
+    },
+    {
+      "name": "崂山区",
+      "lat": 36.1059695,
+      "lon": 120.4645782,
+      "kind": "district",
+      "minZ": 11,
+      "maxZ": 13,
+      "source": "OSM 崂山区行政关系（WGS84）"
+    },
+    {
+      "name": "李沧区",
+      "lat": 36.1453955,
+      "lon": 120.4270377,
+      "kind": "district",
+      "minZ": 11,
+      "maxZ": 14,
+      "source": "OSM 李沧区行政关系（WGS84）"
+    },
+    {
+      "name": "老城",
+      "lat": 36.066,
+      "lon": 120.3155,
+      "kind": "local",
+      "minZ": 12,
+      "maxZ": 16,
+      "source": "由已核实老城点（教堂、中山路、栈桥一带）的位置标注，非行政边界"
+    },
+    {
+      "name": "台东",
+      "lat": 36.0834189,
+      "lon": 120.3511792,
+      "kind": "local",
+      "minZ": 12,
+      "maxZ": 16,
+      "source": "OSM 台东 locality（WGS84）"
+    },
+    {
+      "name": "浮山湾",
+      "lat": 36.0547639,
+      "lon": 120.3764047,
+      "kind": "local",
+      "minZ": 12,
+      "maxZ": 16,
+      "source": "OSM 浮山所湾（浮山湾，WGS84）"
+    },
+    {
+      "name": "太平角",
+      "lat": 36.0507807,
+      "lon": 120.3569531,
+      "kind": "local",
+      "minZ": 13,
+      "maxZ": 17,
+      "source": "OSM 太平角邻里（WGS84）"
+    },
+    {
+      "name": "崂山",
+      "lat": 36.1916667,
+      "lon": 120.5916667,
+      "kind": "district",
+      "minZ": 11,
+      "maxZ": 13,
+      "source": "Wikidata Q1698782 崂山（WGS84），主峰位置，不是太清游览区"
+    },
+    {
+      "name": "八大关",
+      "lat": 36.0537929,
+      "lon": 120.3456498,
+      "kind": "local",
+      "minZ": 13,
+      "maxZ": 15,
+      "source": "OSM 八大关邻里（WGS84）"
+    },
+    {
+      "name": "石老人",
+      "lat": 36.0906493,
+      "lon": 120.4633972,
+      "kind": "local",
+      "minZ": 12,
+      "maxZ": 15,
+      "source": "OSM 石老人海水浴场附近（WGS84）"
+    },
+    {
+      "name": "黄岛区",
+      "lat": 35.958957,
+      "lon": 120.193093,
+      "kind": "district",
+      "minZ": 10,
+      "maxZ": 14,
+      "source": "OSM place=city (Geofabrik Shandong, WGS84, ODbL)"
+    },
+    {
+      "name": "城阳区",
+      "lat": 36.304216,
+      "lon": 120.391378,
+      "kind": "district",
+      "minZ": 10,
+      "maxZ": 14,
+      "source": "OSM place=city (Geofabrik Shandong, WGS84, ODbL)"
+    },
+    {
+      "name": "胶州市",
+      "lat": 36.264087,
+      "lon": 120.028493,
+      "kind": "district",
+      "minZ": 10,
+      "maxZ": 14,
+      "source": "OSM place=city (Geofabrik Shandong, WGS84, ODbL)"
+    },
+    {
+      "name": "即墨区",
+      "lat": 36.389029,
+      "lon": 120.442067,
+      "kind": "district",
+      "minZ": 10,
+      "maxZ": 14,
+      "source": "OSM place=city (Geofabrik Shandong, WGS84, ODbL)"
+    },
+    {
+      "name": "灵山卫",
+      "lat": 35.940857,
+      "lon": 120.136081,
+      "kind": "local",
+      "minZ": 12,
+      "maxZ": 15,
+      "source": "OSM place=suburb (Geofabrik Shandong, WGS84, ODbL)"
+    },
+    {
+      "name": "薛家岛",
+      "lat": 35.96016,
+      "lon": 120.204432,
+      "kind": "local",
+      "minZ": 12,
+      "maxZ": 15,
+      "source": "OSM place=suburb (Geofabrik Shandong, WGS84, ODbL)"
+    },
+    {
+      "name": "红岛",
+      "lat": 36.209441,
+      "lon": 120.258078,
+      "kind": "local",
+      "minZ": 12,
+      "maxZ": 15,
+      "source": "OSM place=suburb (Geofabrik Shandong, WGS84, ODbL)"
+    },
+    {
+      "name": "流亭",
+      "lat": 36.266739,
+      "lon": 120.400807,
+      "kind": "local",
+      "minZ": 12,
+      "maxZ": 15,
+      "source": "OSM place=suburb (Geofabrik Shandong, WGS84, ODbL)"
+    },
+    {
+      "name": "沙子口",
+      "lat": 36.112122,
+      "lon": 120.533724,
+      "kind": "local",
+      "minZ": 12,
+      "maxZ": 15,
+      "source": "OSM place=suburb (Geofabrik Shandong, WGS84, ODbL)"
+    },
+    {
+      "name": "李村",
+      "lat": 36.165453,
+      "lon": 120.418344,
+      "kind": "local",
+      "minZ": 12,
+      "maxZ": 15,
+      "source": "OSM place=suburb (Geofabrik Shandong, WGS84, ODbL)"
+    },
+    {
+      "name": "沧口",
+      "lat": 36.173533,
+      "lon": 120.396465,
+      "kind": "local",
+      "minZ": 12,
+      "maxZ": 15,
+      "source": "OSM place=suburb (Geofabrik Shandong, WGS84, ODbL)"
+    }
+  ],
+  "highlights": {
+    "qinyu": [
+      [
+        36.0524852,
+        120.3186066
+      ],
+      [
+        36.0525912,
+        120.3193888
+      ],
+      [
+        36.0530751,
+        120.3230744
+      ],
+      [
+        36.0548054,
+        120.3269581
+      ]
+    ],
+    "zhongshan": [
+      [
+        36.0641113,
+        120.3138806
+      ],
+      [
+        36.0660839,
+        120.3136126
+      ],
+      [
+        36.0700728,
+        120.3136823
+      ],
+      [
+        36.0725977,
+        120.3133694
+      ]
+    ],
+    "taidong": [
+      [
+        36.081239,
+        120.3524812
+      ]
+    ],
+    "badaguan": [
+      [
+        36.058,
+        120.34
+      ],
+      [
+        36.058,
+        120.3535
+      ],
+      [
+        36.0488,
+        120.3535
+      ],
+      [
+        36.0488,
+        120.34
+      ],
+      [
+        36.058,
+        120.34
+      ]
+    ],
+    "daxue": [
+      [
+        36.060372,
+        120.325482
+      ],
+      [
+        36.061782,
+        120.327585
+      ],
+      [
+        36.063971,
+        120.32999
+      ],
+      [
+        36.067326,
+        120.332421
+      ]
+    ]
+  },
+  "views": {
+    "play": {
+      "name": "游玩区",
+      "bounds": [
+        [
+          36.044,
+          120.304
+        ],
+        [
+          36.08,
+          120.408
+        ]
+      ]
+    },
+    "urban": {
+      "name": "市区",
+      "bounds": [
+        [
+          36.042,
+          120.296
+        ],
+        [
+          36.192,
+          120.505
+        ]
+      ]
+    },
+    "full": {
+      "name": "全域",
+      "bounds": [
+        [
+          35.918,
+          120.1
+        ],
+        [
+          36.205,
+          120.705
+        ]
+      ]
+    },
+    "oldtown": {
+      "name": "老城",
+      "bounds": [
+        [
+          36.051,
+          120.307
+        ],
+        [
+          36.074,
+          120.336
+        ]
+      ]
+    },
+    "east": {
+      "name": "东部",
+      "bounds": [
+        [
+          36.044,
+          120.338
+        ],
+        [
+          36.102,
+          120.48
+        ]
+      ]
+    },
+    "taiqing": {
+      "name": "太清",
+      "bounds": [
+        [
+          36.128,
+          120.65
+        ],
+        [
+          36.155,
+          120.685
+        ]
+      ]
+    }
+  },
+  "docGuide": {
+    "title": "用户文档说明（行程与未落点店）",
+    "sourceNote": "整理自用户提供的 Word 行程单（无表格、无超链接；含一张青岛啤酒博物馆价目表照片）。文档中的口味、菜品、价格和营业相关说法一律视为「文档提供、未实时核实」。",
+    "days": [
+      {
+        "name": "Day 1",
+        "items": [
+          "栈桥（约距火车站 600 米，文档约数）",
+          "天主教堂（沿中山路约 800 米，建议中山路周边走走）",
+          "青岛邮电博物馆（距教堂约 700 米，沿浙江路或老舍公园；沿途安娜别墅、老舍公园）",
+          "德国总督旧址博物馆（文档写沿莒县路约 300 米）",
+          "琴屿路",
+          "金口一路（歪脖子树 / 花墙）",
+          "大学路",
+          "小鱼山–福山支路"
+        ]
+      },
+      {
+        "name": "Day 2",
+        "items": [
+          "石老人海水浴场（有小白房） / 青岛雕塑园（日出）",
+          "第一海水浴场（爱心树 / 适合看夕阳）",
+          "银鱼巷",
+          "啤酒博物馆",
+          "中山公园",
+          "小麦岛",
+          "八大关下午，然后去二浴看日落"
+        ]
+      },
+      {
+        "name": "Day 3",
+        "items": [
+          "燕儿岛",
+          "五四广场"
+        ]
+      }
+    ],
+    "walk": "逛玩散步建议（不强行画轨迹）：观象一路（楼梯上坡）；观象山 / 市立医院地铁 — 基督教堂 — 观象二路 — 悉知小酒馆 — 拐弯不走二路（适合晚上溜溜达达）。市立医院地铁与悉知小酒馆本次待定位。",
+    "image": "文档在窗景咖啡与「小嘬一口」之间插入一张啤酒博物馆价目表照片，已把可见价格抄入啤酒博物馆备注，并标明文档提供、未实时核实。"
+  },
+  "docUpdate": "2026-11-24",
+  "verifyUpdate": "2026-11-24",
+  "outlineUpdate": "2026-11-24"
+}
