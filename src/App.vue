@@ -16,11 +16,11 @@ import TileBanner from './components/TileBanner.vue'
     subtitle="用于行程筛选 · 名单 1–26 全部保留，并已补入用户文档地点，42项待定位已逐条核验 · 坐标 WGS84 · 约略点不是精确店址"
   />
   <div id="main">
-    <TravelMap />
+    <!-- 浮层先挂 DOM，TravelMap nextTick 后再 boot，便于引擎挪进 #map -->
     <BasemapSwitch />
     <TileBanner />
-    <!-- 引擎挪进 #map：左上角悬浮详情卡 -->
     <div id="detail" class="detail-card" aria-live="polite" />
+    <TravelMap />
     <SidePanel />
   </div>
 </template>

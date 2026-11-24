@@ -22,7 +22,8 @@ import places from "../config/places.json";
 import mapMeta from "../config/map-meta.json";
 import offsets from "../config/marker-offsets.json";
 import fallback from "../config/outline-fallback.json";
-import { notifyBasemap, notifyPanelClose } from "./map-bridge.js";
+import tripPlan from "../config/trip-plan.json";
+import { notifyBasemap, notifyPanelClose, notifyPlanState } from "./map-bridge.js";
 
 /** 把四分配置合成引擎用的 DATA 对象 */
 function buildData() {
@@ -84,7 +85,12 @@ if (typeof window !== "undefined") {
     tilesOk: false,
     fallbackOn: false,
     panelOpen: true,
-    viewKey: "play"
+    viewKey: "play",
+    /** 计划模式默认开；关则完整浏览 places */
+    planMode: true,
+    planDayId: (tripPlan.days && tripPlan.days[0] && tripPlan.days[0].id) || null,
+    /** 当日画路线时跳过的提示（无坐标节点等） */
+    planSkipHints: []
   };
 
   var map, layers = {}, fallbackGroup, highlightGroup, labelRoot, areaRoot, svgRoot;
@@ -132,11 +138,212 @@ if (typeof window !== "undefined") {
     return L.latLng(rec.item.lat, rec.item.lon);
   }
 
-  /** 当前筛选（类型 + 搜索词）下该点是否显示 */
+  /* ---------- 计划模式：trip-plan.json ---------- */
+  function planExcludedIds() {
+    var set = {};
+    (tripPlan.exclusions || []).forEach(function (ex) {
+      if (ex && ex.placeId) set[ex.placeId] = true;
+    });
+    return set;
+  }
+
+  function getPlanDay(dayId) {
+    var id = dayId || state.planDayId;
+    var days = tripPlan.days || [];
+    for (var i = 0; i < days.length; i++) {
+      if (days[i].id === id) return days[i];
+    }
+    return days[0] || null;
+  }
+
+  /** 当日 primary + optional 地点 id（不含 exclusions） */
+  function planDayPlaceIdSet(day) {
+    var excluded = planExcludedIds();
+    var set = {};
+    if (!day) return set;
+    (day.nodes || []).forEach(function (node) {
+      (node.primaryPlaceIds || []).forEach(function (pid) {
+        if (!excluded[pid]) set[pid] = true;
+      });
+      (node.optionalPlaceIds || []).forEach(function (pid) {
+        if (!excluded[pid]) set[pid] = true;
+      });
+    });
+    return set;
+  }
+
+  function findPlaceCoords(placeId) {
+    var found = findPlace(placeId);
+    if (!found || found.item.lat == null || found.item.lon == null) return null;
+    return L.latLng(found.item.lat, found.item.lon);
+  }
+
+  /** 节点锚点：第一个有坐标的 primaryPlaceId */
+  function nodeAnchorLatLng(node) {
+    if (!node) return null;
+    var ids = node.primaryPlaceIds || [];
+    for (var i = 0; i < ids.length; i++) {
+      var ll = findPlaceCoords(ids[i]);
+      if (ll) return ll;
+    }
+    return null;
+  }
+
+  function emitPlanState() {
+    var days = (tripPlan.days || []).map(function (d) {
+      return { id: d.id, label: d.label };
+    });
+    notifyPlanState({
+      planMode: !!state.planMode,
+      dayId: state.planDayId,
+      days: days,
+      contentStatus: tripPlan.contentStatus || "awaiting-planner",
+      skipHints: state.planSkipHints.slice()
+    });
+  }
+
+  function setPlanMode(on) {
+    state.planMode = !!on;
+    refreshVisibility();
+    redrawPlanRoutes();
+    emitPlanState();
+  }
+
+  function setPlanDay(dayId) {
+    var day = getPlanDay(dayId);
+    if (!day) return;
+    state.planDayId = day.id;
+    refreshVisibility();
+    redrawPlanRoutes();
+    emitPlanState();
+    fitPlanDay(day);
+  }
+
+  function getPlanState() {
+    return {
+      planMode: !!state.planMode,
+      dayId: state.planDayId,
+      days: (tripPlan.days || []).map(function (d) {
+        return { id: d.id, label: d.label };
+      }),
+      contentStatus: tripPlan.contentStatus || "awaiting-planner",
+      skipHints: state.planSkipHints.slice()
+    };
+  }
+
+  function fitPlanDay(day) {
+    if (!map || !day) return;
+    var pts = [];
+    (day.nodes || []).forEach(function (node) {
+      var ll = nodeAnchorLatLng(node);
+      if (ll) pts.push(ll);
+    });
+    if (pts.length >= 2) {
+      map.fitBounds(L.latLngBounds(pts).pad(0.25), { animate: true, maxZoom: 15 });
+    } else if (pts.length === 1) {
+      map.setView(pts[0], Math.max(map.getZoom(), 14), { animate: true });
+    }
+  }
+
+  /**
+   * 重画当日主路线。图层独立于底图，切街道图/轮廓不丢。
+   * 只画 segments 声明的节点间连线；optional 餐饮不进主线。
+   */
+  function redrawPlanRoutes() {
+    if (!layers.planRoutes) return;
+    layers.planRoutes.clearLayers();
+    state.planSkipHints = [];
+    if (!state.planMode) {
+      emitPlanState();
+      return;
+    }
+    var day = getPlanDay();
+    if (!day) {
+      emitPlanState();
+      return;
+    }
+
+    var nodeById = {};
+    (day.nodes || []).forEach(function (n) {
+      nodeById[n.id] = n;
+      if (!nodeAnchorLatLng(n)) {
+        state.planSkipHints.push(
+          "节点「" + (n.title || n.id) + "」无可用坐标，已跳过定位/路线端点"
+        );
+      }
+    });
+
+    (day.segments || []).forEach(function (seg) {
+      var fromN = nodeById[seg.fromNodeId];
+      var toN = nodeById[seg.toNodeId];
+      if (!fromN || !toN) {
+        state.planSkipHints.push("路段 " + (seg.id || "") + " 引用了未知节点，已跳过");
+        return;
+      }
+      var a = nodeAnchorLatLng(fromN);
+      var b = nodeAnchorLatLng(toN);
+      if (!a || !b) {
+        state.planSkipHints.push(
+          "路段 " + (seg.id || fromN.title + "→" + toN.title) + " 端点缺坐标，已跳过"
+        );
+        return;
+      }
+
+      var isSchematic = seg.routeKind === "schematic" || !seg.geometry || !seg.geometry.length;
+      var latlngs;
+      if (!isSchematic && seg.geometry && seg.geometry.length >= 2) {
+        latlngs = seg.geometry.map(function (p) { return L.latLng(p[0], p[1]); });
+      } else {
+        latlngs = [a, b];
+        isSchematic = true;
+      }
+
+      var mode = seg.mode || "other";
+      var color =
+        mode === "walk" ? "#1a7a8c" :
+        mode === "ferry" ? "#2a6fbf" :
+        mode === "transit" ? "#6b3d9c" :
+        mode === "taxi" ? "#d26512" : "#5c6568";
+      var dash = isSchematic || mode !== "walk" ? "8 10" : null;
+      var line = L.polyline(latlngs, {
+        pane: "planRoutePane",
+        color: color,
+        weight: isSchematic ? 3 : 4,
+        opacity: 0.85,
+        dashArray: dash || undefined,
+        lineCap: "round",
+        lineJoin: "round",
+        interactive: true
+      });
+      var tip = (isSchematic ? "路线示意，非导航" : "行程折线（非导航）") +
+        " · " + mode +
+        (seg.estimatedMinutes != null ? " · 约" + seg.estimatedMinutes + "分钟" : "") +
+        (seg.note ? " · " + seg.note : "");
+      line.bindTooltip(tip, {
+        sticky: true,
+        className: "qd-route-tip",
+        opacity: 0.95
+      });
+      line.addTo(layers.planRoutes);
+    });
+
+    emitPlanState();
+  }
+
+  /** 当前筛选（类型 + 搜索词 + 可选计划日）下该点是否显示 */
   function itemVisible(rec) {
     var p = rec.parent;
     var it = rec.item;
     if (!state.catOn[p.category]) return false;
+    if (planExcludedIds()[it.id] || planExcludedIds()[p.id]) {
+      if (state.planMode) return false;
+    }
+    if (state.planMode) {
+      var idSet = planDayPlaceIdSet(getPlanDay());
+      /* 空行程日：不显示任何点（避免把全库当成当日计划） */
+      if (!Object.keys(idSet).length) return false;
+      if (!idSet[it.id] && !idSet[p.id]) return false;
+    }
     var q = state.query.trim().toLowerCase();
     if (q) {
       var blob = [p.num, p.name, it.name, p.address, it.address, p.note, it.note, p.label, it.label]
@@ -562,6 +769,10 @@ if (typeof window !== "undefined") {
     layers.markers = L.layerGroup().addTo(map);
     layers.ranges = L.layerGroup().addTo(map);
     layers.leaders = L.layerGroup().addTo(map);
+    /* 计划路线：独立图层，切底图不重建、不丢失 */
+    if (!layers.planRoutes) {
+      layers.planRoutes = L.featureGroup().addTo(map);
+    }
     allMapItems().forEach(function (rec) {
       var it = rec.item;
       var trueLL = trueLatLngOf(rec);
@@ -851,8 +1062,120 @@ if (typeof window !== "undefined") {
     return html;
   }
 
-  /** 地点清单：按类型手风琴分组（景点 / 餐饮 / 酒馆 / 文创） */
+  function placeById(id) {
+    var found = findPlace(id);
+    return found ? found.parent : null;
+  }
+
+  /** 计划模式清单：按行程节点手风琴；锚点 + 可去餐饮/咖啡下拉 */
+  function renderPlanList() {
+    var box = $("list");
+    if (!box) return;
+    var day = getPlanDay();
+    var html = "";
+
+    if (!day) {
+      box.innerHTML = '<p class="hint">未配置行程日。</p>';
+      return;
+    }
+
+    if (day.summary) {
+      html += '<p class="plan-day-summary">' + escapeHtml(day.summary) + "</p>";
+    }
+
+    var wasOpen = {};
+    var hadAcc = false;
+    box.querySelectorAll("details.list-acc").forEach(function (d) {
+      hadAcc = true;
+      wasOpen[d.getAttribute("data-node")] = d.open;
+    });
+
+    var nodes = day.nodes || [];
+    if (!nodes.length) {
+      html += '<p class="hint">当日节点待策划填入 <code>trip-plan.json</code>。关闭右上角「计划」可浏览全部地点。</p>';
+      var excl = tripPlan.exclusions || [];
+      if (excl.length) {
+        html += '<p class="hint plan-excl">计划排除：';
+        html += excl.map(function (ex) {
+          var pl = placeById(ex.placeId);
+          return escapeHtml((pl && pl.name) || ex.placeId) +
+            (ex.reason ? "（" + escapeHtml(ex.reason) + "）" : "");
+        }).join("；");
+        html += "</p>";
+      }
+      box.innerHTML = html;
+      return;
+    }
+
+    nodes.forEach(function (node) {
+      var openAttr = (!hadAcc || wasOpen[node.id] !== false) ? " open" : "";
+      var timeBits = [];
+      if (node.startTime) timeBits.push(node.startTime);
+      if (node.endTime) timeBits.push(node.endTime);
+      var timeStr = timeBits.length ? timeBits.join("–") : "";
+      html += '<details class="list-acc plan-node" data-node="' + escapeHtml(node.id) + '"' + openAttr + ">";
+      html += "<summary><span class=\"plan-node-title\">" + escapeHtml(node.title) + "</span>";
+      if (timeStr) html += '<span class="acc-count">' + escapeHtml(timeStr) + "</span>";
+      html += "</summary><div class=\"list-acc-body\">";
+
+      if (node.notes) {
+        html += '<p class="hint">' + escapeHtml(node.notes) + "</p>";
+      }
+      if (node.meal && (node.meal.kind || node.meal.note)) {
+        html += '<p class="meta">用餐：' +
+          escapeHtml([node.meal.kind, node.meal.note].filter(Boolean).join(" · ")) +
+          "</p>";
+      }
+
+      html += '<div class="plan-sub">锚点</div>';
+      var primCount = 0;
+      (node.primaryPlaceIds || []).forEach(function (pid) {
+        if (planExcludedIds()[pid]) return;
+        var pl = placeById(pid);
+        if (!pl) {
+          html += '<p class="hint">未知地点 id：' + escapeHtml(pid) + "</p>";
+          return;
+        }
+        if (!state.catOn[pl.category]) return;
+        primCount += 1;
+        html += renderPlaceItem(pl);
+      });
+      if (!primCount) html += '<p class="hint">本节点暂无可见锚点（或被类型筛选隐藏）。</p>';
+
+      var opts = (node.optionalPlaceIds || []).filter(function (pid) {
+        if (planExcludedIds()[pid]) return false;
+        var pl = placeById(pid);
+        return pl && state.catOn[pl.category];
+      });
+      if (opts.length) {
+        html += '<details class="plan-optional"><summary>可去（餐饮/咖啡等）' +
+          '<span class="acc-count">' + opts.length + "</span></summary>";
+        html += '<div class="list-acc-body">';
+        opts.forEach(function (pid) {
+          var pl = placeById(pid);
+          if (pl) html += renderPlaceItem(pl);
+        });
+        html += "</div></details>";
+      }
+
+      html += "</div></details>";
+    });
+
+    box.innerHTML = html;
+    box.querySelectorAll(".item").forEach(function (el) {
+      el.addEventListener("click", function () {
+        selectItem(el.getAttribute("data-id"), true, true);
+      });
+    });
+  }
+
+  /** 地点清单：浏览=按类型；计划=按当日节点 */
   function renderList() {
+    if (state.planMode) {
+      renderPlanList();
+      return;
+    }
+
     var box = $("list");
     if (!box) return;
 
@@ -1092,9 +1415,30 @@ if (typeof window !== "undefined") {
       layoutLabels();
     }, 200);
   }
+  /** 把晚挂载的 Vue 浮层挪进 #map（避免 TravelMap 早于 PlanDaySwitch 启动） */
+  function ensureMapOverlays() {
+    if (!map) return;
+    var host = map.getContainer();
+    function adopt(id) {
+      var el = $(id);
+      if (!el) return;
+      if (el.parentNode !== host) {
+        host.appendChild(el);
+        L.DomEvent.disableClickPropagation(el);
+        L.DomEvent.disableScrollPropagation(el);
+      }
+    }
+    adopt("basemap-switch");
+    adopt("detail");
+    adopt("tile-banner");
+  }
+
   function refreshUi() {
+    ensureMapOverlays();
     renderDocGuide();
     renderList();
+    redrawPlanRoutes();
+    emitPlanState();
     if (state.selected) {
       var found = findPlace(state.selected);
       if (found) renderDetail(found);
@@ -1132,6 +1476,9 @@ if (typeof window !== "undefined") {
     map.getPane("detailPane").style.pointerEvents = "none";
     map.createPane("rangePane");
     map.getPane("rangePane").style.zIndex = 615;
+    map.createPane("planRoutePane");
+    map.getPane("planRoutePane").style.zIndex = 620;
+    map.getPane("planRoutePane").style.pointerEvents = "auto";
     map.createPane("dotsPane");
     map.getPane("dotsPane").style.zIndex = 640;
     fallbackGroup = buildFallback();
@@ -1184,17 +1531,21 @@ if (typeof window !== "undefined") {
     bindUi();
     map.invalidateSize();
     fitView("play", { animate: false });
-    renderList();
-    layoutLabels();
+    /* 计划默认开：按当日节点过滤点位（空行程则先不显示全库点） */
+    refreshVisibility();
     requestBase(OUTLINE_NAME, "init");
     syncOutlineZoom();
+    redrawPlanRoutes();
+    emitPlanState();
 
     /* Refit default/current view after the pane has its real size (PC and narrow). */
     setTimeout(function () {
       map.invalidateSize();
       fitView(state.viewKey, { animate: false });
       syncOutlineZoom();
-      layoutLabels();
+      refreshVisibility();
+      redrawPlanRoutes();
+      emitPlanState();
     }, 300);
   }
 
@@ -1230,6 +1581,9 @@ if (typeof window !== "undefined") {
       setPanelOpen: setPanelOpen,
       setBasemap: setBasemap,
       getBasemap: getBasemap,
+      setPlanMode: setPlanMode,
+      setPlanDay: setPlanDay,
+      getPlanState: getPlanState,
       selectItem: selectItem,
       refreshUi: refreshUi
     };

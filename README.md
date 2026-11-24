@@ -12,6 +12,7 @@ Vue 3 + Vite + **Element Plus** + Leaflet / MapLibre。
 | 想做什么 | 改哪个文件 |
 |----------|------------|
 | 增删改地点、备注、坐标 | `src/config/places.json` |
+| 每日行程节点 / 路段 / 排除 | `src/config/trip-plan.json` |
 | 视图范围 / 区名 / 行程说明 | `src/config/map-meta.json` |
 | 两个点叠在一起要错开 | `src/config/marker-offsets.json` |
 | 离线路网（几乎别动） | `src/config/outline-fallback.json` |
@@ -21,7 +22,7 @@ Vue 3 + Vite + **Element Plus** + Leaflet / MapLibre。
 改完建议：
 
 ```bash
-npm run validate:places
+npm run validate
 npm run dev
 ```
 
@@ -57,10 +58,14 @@ npm install
 npm run dev            # http://127.0.0.1:43146
 npm run build          # → dist/index.html（JS/CSS 已内联成单文件）
 npm run preview        # http://127.0.0.1:43147
+npm run validate           # places + trip-plan
 npm run validate:places
+npm run validate:trip-plan
 ```
 
 也可直接用浏览器打开 `dist/index.html`（街道图需联网；内置轮廓可离线）。
+
+右上角「计划」开关默认开启：按 `trip-plan.json` 的当日节点组织菜单并画示意路线；关闭则回到完整地点浏览。行程内容由策划写入 JSON，勿把骨架空行程当成最终计划。
 
 ---
 

@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "timezone": "Asia/Shanghai",
+  "contentStatus": "awaiting-planner",
+  "assumptions": [
+    "最终每日行程待策划草案接入；本文件仅为可运行 schema 骨架，不是真实最终行程。",
+    "主路线仅连接 nodes 之间由 segments 声明的路段，不把 optionalPlaceIds 串进主线。",
+    "无 geometry 或 routeKind=schematic 的线段为示意直线，界面标注「路线示意，非导航」。",
+    "跨海/公交/轮渡等勿标成 walk；未知或无坐标节点跳过并提示。",
+    "陈记食集（placeId=10）列入 exclusions：本次行程排除、不为它绕路；places.json 主记录保留。"
+  ],
+  "exclusions": [
+    {
+      "placeId": "10",
+      "reason": "陈记食集：本次行程排除，不为它绕路"
+    }
+  ],
+  "days": [
+    {
+      "id": "day1",
+      "label": "Day 1",
+      "date": null,
+      "summary": "待策划填入",
+      "nodes": [],
+      "segments": []
+    },
+    {
+      "id": "day2",
+      "label": "Day 2",
+      "date": null,
+      "summary": "待策划填入",
+      "nodes": [],
+      "segments": []
+    },
+    {
+      "id": "day3",
+      "label": "Day 3",
+      "date": null,
+      "summary": "待策划填入",
+      "nodes": [],
+      "segments": []
+    }
+  ]
+}

@@ -1,20 +1,24 @@
-# 配置文件说明（改地点先看这里）
+# 配置文件说明（改地点 / 行程先看这里）
 
-JSON **不能写注释**，所以字段含义写在本文件。日常只改 `places.json` 即可。
+JSON **不能写注释**，所以字段含义写在本文件。日常改地点用 `places.json`；改每日行程用 `trip-plan.json`。
 
-## 四个文件各干什么
+## 配置文件各干什么
 
 | 文件 | 要不要常改 | 作用 |
 |------|------------|------|
-| `places.json` | **主要改这个** | 94 个地点 + 嵌套候选店 |
+| `places.json` | **主数据** | 94 个地点 + 嵌套候选店（真坐标只维护在这里） |
+| `trip-plan.json` | **行程** | 每日节点 / 路段 / 排除项；只引用 places 全局 id |
 | `map-meta.json` | 偶尔 | 视图范围、区域名、高亮线、行程说明文案 |
 | `marker-offsets.json` | 很少 | 两个点坐标太近时，图上错开显示的偏移量 |
 | `outline-fallback.json` | 几乎不改 | 离线「内置轮廓」底图的海岸线/路网几何（很大） |
 
-改完地点后在项目根目录跑：
+改完后在项目根目录跑：
 
 ```bash
+npm run validate
+# 或分别：
 npm run validate:places
+npm run validate:trip-plan
 ```
 
 ## places.json — 一条地点长什么样
@@ -105,3 +109,61 @@ npm run validate:places
 ## outline-fallback.json
 
 离线底图几何，体积很大。不要手改坐标；只有要重做离线路网时才动。
+
+## trip-plan.json — 每日行程
+
+地点坐标**不要**写进本文件；用 `places.json` / `candidates` 的全局 `id` 引用。
+
+```json
+{
+  "schemaVersion": 1,
+  "timezone": "Asia/Shanghai",
+  "contentStatus": "awaiting-planner",
+  "assumptions": ["说明性假设，给人看"],
+  "exclusions": [{ "placeId": "10", "reason": "本次行程排除" }],
+  "days": [
+    {
+      "id": "day1",
+      "label": "Day 1",
+      "date": null,
+      "summary": "当日摘要",
+      "nodes": [
+        {
+          "id": "d1-n1",
+          "title": "片区/节点名",
+          "startTime": "10:00",
+          "endTime": "12:00",
+          "durationMinutes": 120,
+          "primaryPlaceIds": ["1a"],
+          "optionalPlaceIds": ["50"],
+          "meal": { "kind": "lunch", "note": "可选" },
+          "notes": "可步行归入本节点的说明"
+        }
+      ],
+      "segments": [
+        {
+          "id": "d1-s1",
+          "fromNodeId": "d1-n1",
+          "toNodeId": "d1-n2",
+          "mode": "walk",
+          "estimatedMinutes": 20,
+          "geometry": null,
+          "routeKind": "schematic",
+          "note": "路线示意，非导航"
+        }
+      ]
+    }
+  ]
+}
+```
+
+| 字段 | 含义 |
+|------|------|
+| `contentStatus` | `awaiting-planner` 骨架待填 / `draft` 草案 / `ready` 可发布（ready 时不允许空 nodes） |
+| `exclusions` | 从**计划**排除的 placeId（不删 places 主记录）。例：陈记食集 `10` |
+| `nodes[].primaryPlaceIds` | 节点锚点（优先景点），用于定位与主路线端点 |
+| `nodes[].optionalPlaceIds` | 节点附近可选餐饮/咖啡等，**不**进主路线 |
+| `segments` | 只连接实际计划节点；`mode`: walk/transit/ferry/taxi/other |
+| `routeKind` | `schematic` 或无 geometry → 直线示意并标注「路线示意，非导航」 |
+
+策划填内容后把 `contentStatus` 改为 `draft` 或 `ready`，再跑 `npm run validate:trip-plan`。
