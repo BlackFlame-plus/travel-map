@@ -343,6 +343,34 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
 }
 .plan-optional > summary::-webkit-details-marker { display: none; }
 .plan-excl { color: #8a4b1a !important; }
+.plan-pending-meal {
+  border: 1px dashed #c4b59a;
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: #fffaf0;
+}
+.plan-note-fold {
+  margin: 0 0 8px;
+  border: 0;
+  background: transparent;
+}
+.plan-note-fold > summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--muted, #5c6568);
+  padding: 0;
+}
+.plan-note-fold > summary::-webkit-details-marker { display: none; }
+.plan-note-fold .plan-note-more {
+  color: var(--accent, #1a7a8c);
+  font-weight: 650;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+.plan-note-fold[open] > summary { display: none; }
+.plan-note-fold > p { margin: 0; }
 #map .leaflet-top.leaflet-right .leaflet-control {
   margin-top: 0;
   margin-right: 0;

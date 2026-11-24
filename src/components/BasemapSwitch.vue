@@ -46,6 +46,14 @@ function pickDay(id: string) {
   getMapApi()?.setPlanDay?.(id)
 }
 
+/** 按钮用短标签，完整主题留在侧栏 summary */
+function dayBtnText(d: DayBrief) {
+  if (d.id === 'day1') return 'Day 1'
+  if (d.id === 'day2') return 'Day 2'
+  if (d.id === 'day3') return 'Day 3'
+  return d.label
+}
+
 onMounted(() => {
   setBasemapHandler((which: 'ofm' | 'outline') => {
     current.value = which
@@ -152,7 +160,7 @@ onBeforeUnmount(() => {
         :aria-selected="d.id === dayId ? 'true' : 'false'"
         @click="pickDay(d.id)"
       >
-        {{ d.label }}
+        {{ dayBtnText(d) }}
       </button>
     </div>
   </div>

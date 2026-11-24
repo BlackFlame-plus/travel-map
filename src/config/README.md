@@ -116,11 +116,13 @@ npm run validate:trip-plan
 
 ### 日结构约定（已与用户确认）
 
-- 默认 **恰好 3 个完整游览日**：`day1` / `day2` / `day3`，`date: null`（时间住宿未定，不绑元旦日期）。
+- 默认 **恰好 3 个完整游览日**：`day1` / `day2` / `day3`，`date: null`（时间住宿未定，不绑节假日）。
 - **不要**加 Day0 / Day4 假装抵达/返程游玩日。
-- 草案主题可写在 `summary`；真正节点进 `nodes`/`segments` 后把 `contentStatus` 改为 `draft` 或 `ready`。
+- 现行内容见 `trip-plan.json`（`contentStatus: draft`）与说明 `trip-plan.notes.md`。
 - 陈记食集 `placeId: "10"` 只进 `exclusions`，不删 places。
-- 老杰克：默认一晚放某节点 `primaryPlaceIds`（或 notes）；其余分店只进 `optionalPlaceIds`。
+- 老杰克默认仅 Day2 `13-haitian`；Day3 `13-hk65` 仅条件替换，不进默认路线。
+- 无坐标就近饭点：`primaryPlaceIds: []`，**不作** segment 端点；可选景点/餐饮只进 `optionalPlaceIds`。
+- 小麦岛不画默认连线（仅说明中的独立可选项）。
 
 ```json
 {

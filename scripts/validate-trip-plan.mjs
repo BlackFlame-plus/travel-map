@@ -76,8 +76,14 @@ for (const day of plan.days) {
     nodeIds.add(node.id)
     allNodeIds.add(node.id)
     if (!node.title) fail(`node ${node.id} missing title`)
-    if (!Array.isArray(node.primaryPlaceIds) || !node.primaryPlaceIds.length) {
-      fail(`node ${node.id} needs primaryPlaceIds`)
+    if (!Array.isArray(node.primaryPlaceIds)) {
+      fail(`node ${node.id} primaryPlaceIds must be an array`)
+    }
+    /* 允许空 primary：就近待选饭点等无坐标停留，不作路线端点 */
+    if (!node.primaryPlaceIds.length) {
+      if (!node.meal && !node.notes) {
+        warn(`node ${node.id} has empty primaryPlaceIds and no meal/notes`)
+      }
     }
     for (const pid of node.primaryPlaceIds || []) {
       if (excluded.has(pid)) fail(`excluded place ${pid} used as primary in node ${node.id}`)

@@ -109,7 +109,10 @@ onBeforeUnmount(() => {
 
     <div v-if="planMode" class="plan-banner">
       <p v-if="contentStatus === 'awaiting-planner'" class="hint">
-        行程内容待策划写入 <code>trip-plan.json</code>（当前为 schema 骨架，非最终行程）。
+        行程内容待策划写入 <code>trip-plan.json</code>。
+      </p>
+      <p v-else-if="contentStatus === 'draft'" class="hint">
+        当前为市南可调整<strong>草案</strong>（时间/住宿未定，date 未绑定）；示意路线非导航。
       </p>
       <ul v-if="skipHints.length" class="plan-skip-hints">
         <li v-for="(h, i) in skipHints" :key="i">{{ h }}</li>

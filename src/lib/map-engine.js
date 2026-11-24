@@ -266,9 +266,10 @@ if (typeof window !== "undefined") {
     var nodeById = {};
     (day.nodes || []).forEach(function (n) {
       nodeById[n.id] = n;
-      if (!nodeAnchorLatLng(n)) {
+      var hasPrim = (n.primaryPlaceIds || []).length > 0;
+      if (hasPrim && !nodeAnchorLatLng(n)) {
         state.planSkipHints.push(
-          "节点「" + (n.title || n.id) + "」无可用坐标，已跳过定位/路线端点"
+          "节点「" + (n.title || n.id) + "」主锚无可用坐标，已跳过定位/路线端点"
         );
       }
     });
@@ -1067,6 +1068,20 @@ if (typeof window !== "undefined") {
     return found ? found.parent : null;
   }
 
+  /** 长说明默认截断，点「展开」看全文（不改策划原文） */
+  function renderExpandableText(text, cssClass) {
+    var full = String(text || "");
+    if (!full) return "";
+    var limit = 90;
+    if (full.length <= limit) {
+      return '<p class="' + cssClass + '">' + escapeHtml(full) + "</p>";
+    }
+    var short = full.slice(0, limit).replace(/\s+\S*$/, "") + "…";
+    return '<details class="plan-note-fold">' +
+      "<summary>" + escapeHtml(short) + " <span class=\"plan-note-more\">展开</span></summary>" +
+      '<p class="' + cssClass + '">' + escapeHtml(full) + "</p></details>";
+  }
+
   /** 计划模式清单：按行程节点手风琴；锚点 + 可去餐饮/咖啡下拉 */
   function renderPlanList() {
     var box = $("list");
@@ -1080,7 +1095,7 @@ if (typeof window !== "undefined") {
     }
 
     if (day.summary) {
-      html += '<p class="plan-day-summary">' + escapeHtml(day.summary) + "</p>";
+      html += renderExpandableText(day.summary, "plan-day-summary");
     }
 
     var wasOpen = {};
@@ -1092,23 +1107,15 @@ if (typeof window !== "undefined") {
 
     var nodes = day.nodes || [];
     if (!nodes.length) {
-      html += '<p class="hint">当日节点待策划填入 <code>trip-plan.json</code>。关闭右上角「计划」可浏览全部地点。</p>';
-      var excl = tripPlan.exclusions || [];
-      if (excl.length) {
-        html += '<p class="hint plan-excl">计划排除：';
-        html += excl.map(function (ex) {
-          var pl = placeById(ex.placeId);
-          return escapeHtml((pl && pl.name) || ex.placeId) +
-            (ex.reason ? "（" + escapeHtml(ex.reason) + "）" : "");
-        }).join("；");
-        html += "</p>";
-      }
+      html += '<p class="hint">当日暂无节点。关闭右上角「计划」可浏览全部地点。</p>';
       box.innerHTML = html;
       return;
     }
 
-    nodes.forEach(function (node) {
-      var openAttr = (!hadAcc || wasOpen[node.id] !== false) ? " open" : "";
+    nodes.forEach(function (node, idx) {
+      var openAttr = "";
+      if (!hadAcc) openAttr = idx < 2 ? " open" : "";
+      else if (wasOpen[node.id]) openAttr = " open";
       var timeBits = [];
       if (node.startTime) timeBits.push(node.startTime);
       if (node.endTime) timeBits.push(node.endTime);
@@ -1119,28 +1126,33 @@ if (typeof window !== "undefined") {
       html += "</summary><div class=\"list-acc-body\">";
 
       if (node.notes) {
-        html += '<p class="hint">' + escapeHtml(node.notes) + "</p>";
+        html += renderExpandableText(node.notes, "hint");
       }
       if (node.meal && (node.meal.kind || node.meal.note)) {
-        html += '<p class="meta">用餐：' +
-          escapeHtml([node.meal.kind, node.meal.note].filter(Boolean).join(" · ")) +
-          "</p>";
+        var mealLabel = node.meal.kind ? ("用餐（" + node.meal.kind + "）") : "用餐";
+        html += '<div class="plan-sub">' + escapeHtml(mealLabel) + "</div>";
+        if (node.meal.note) html += renderExpandableText(node.meal.note, "meta");
       }
 
-      html += '<div class="plan-sub">锚点</div>';
-      var primCount = 0;
-      (node.primaryPlaceIds || []).forEach(function (pid) {
-        if (planExcludedIds()[pid]) return;
-        var pl = placeById(pid);
-        if (!pl) {
-          html += '<p class="hint">未知地点 id：' + escapeHtml(pid) + "</p>";
-          return;
-        }
-        if (!state.catOn[pl.category]) return;
-        primCount += 1;
-        html += renderPlaceItem(pl);
-      });
-      if (!primCount) html += '<p class="hint">本节点暂无可见锚点（或被类型筛选隐藏）。</p>';
+      var prims = node.primaryPlaceIds || [];
+      if (!prims.length) {
+        html += '<p class="hint plan-pending-meal">就近待选（无坐标主锚，不作路线端点；属草案真实缺项）。</p>';
+      } else {
+        html += '<div class="plan-sub">主选</div>';
+        var primCount = 0;
+        prims.forEach(function (pid) {
+          if (planExcludedIds()[pid]) return;
+          var pl = placeById(pid);
+          if (!pl) {
+            html += '<p class="hint">未知地点 id：' + escapeHtml(pid) + "</p>";
+            return;
+          }
+          if (!state.catOn[pl.category]) return;
+          primCount += 1;
+          html += renderPlaceItem(pl);
+        });
+        if (!primCount) html += '<p class="hint">本节点主选被类型筛选隐藏。</p>';
+      }
 
       var opts = (node.optionalPlaceIds || []).filter(function (pid) {
         if (planExcludedIds()[pid]) return false;
@@ -1148,7 +1160,7 @@ if (typeof window !== "undefined") {
         return pl && state.catOn[pl.category];
       });
       if (opts.length) {
-        html += '<details class="plan-optional"><summary>可去（餐饮/咖啡等）' +
+        html += '<details class="plan-optional"><summary>可选（替换/备选，不进默认路线）' +
           '<span class="acc-count">' + opts.length + "</span></summary>";
         html += '<div class="list-acc-body">';
         opts.forEach(function (pid) {
@@ -1160,6 +1172,16 @@ if (typeof window !== "undefined") {
 
       html += "</div></details>";
     });
+
+    var excl = tripPlan.exclusions || [];
+    if (excl.length) {
+      html += '<p class="hint plan-excl">计划排除：';
+      html += excl.map(function (ex) {
+        var pl = placeById(ex.placeId);
+        return escapeHtml((pl && pl.name) || ex.placeId);
+      }).join("、");
+      html += "</p>";
+    }
 
     box.innerHTML = html;
     box.querySelectorAll(".item").forEach(function (el) {
