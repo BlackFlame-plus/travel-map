@@ -3,7 +3,7 @@
  *
  * 检查项：
  * - 正好 94 条主地点（若你故意增删，改下面的期望数量）
- * - id 全局唯一（含 candidates）；当前期望 120 个 id（删极地分店 76-jidi 后）
+ * - id 全局唯一（含 candidates）；当前期望 115 个 id（按计划精简多分店后）
  * - category / precision 落在允许枚举内
  * - 非 pending、且未 hideDot 的点必须有 lat/lon
  *
@@ -27,7 +27,7 @@ function fail(msg) {
 }
 
 const EXPECTED_PLACE_COUNT = 94
-const EXPECTED_ID_COUNT = 120
+const EXPECTED_ID_COUNT = 115
 
 if (!Array.isArray(places) || places.length !== EXPECTED_PLACE_COUNT) {
   fail(`expected ${EXPECTED_PLACE_COUNT} places, got ${places?.length}`)

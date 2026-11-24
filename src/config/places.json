@@ -282,24 +282,12 @@
     "foodKind": "bar",
     "status": "named",
     "precision": "candidate",
-    "address": "公开资料可见至少两处，行程尚未指定",
-    "note": "用户只给了店名。公开资料里至少有：①香港中路65号/65-3号（燕儿岛路书城对面）的老杰克酒吧/咖啡馆；②香港西路48号海天MALL 的 OLD JACK CAFE。二者都不是“五四广场”本身（广场约在西侧1.5公里）。图上把这两处都标成候选参考（路口/商场，非铺位实测）。未指定去哪一家，不要默认其中之一。\n【用户文档】列入「小嘬一口」，仅给店名，仍未指定分店。图上候选与此前一致，不默认其中一家，也不标在五四广场中心。",
-    "source": "DRiNK饮迷、大众点评、携程等公开地址；OSM 海天MALL、燕儿岛路新华书店/香港中路路口（WGS84）。",
-    "searchQuery": "老杰克酒馆 青岛",
+    "address": "市南区香港西路48号海天MALL（资料写 G08 / LG）",
+    "note": "【用户文档】列入「小嘬一口」。\n按行程计划只保留海天MALL店作默认酒馆；公开资料曾另有香港中路店，已按计划精简分支删除上图分店。针点为商场位置，不是铺位实测，也不是五四广场中心。",
+    "source": "公开目录 OLD JACK CAFE（青岛海天MALL店）；OSM 海天MALL 36.05657,120.36426（WGS84）。",
+    "searchQuery": "老杰克 海天MALL 青岛",
     "hideDot": true,
     "candidates": [
-      {
-        "id": "13-hk65",
-        "name": "老杰克·香港中路店（候选）",
-        "lat": 36.0653139,
-        "lon": 120.3968134,
-        "precision": "area-ref",
-        "radiusM": 90,
-        "address": "市南区香港中路65号 / 65-3号（燕儿岛路书城对面）",
-        "note": "候选，不是已指定目的地。针点为 OSM 燕儿岛路新华书店，因公开地址写“书城对面”；表示该路口一带，不是店面实测。不是五四广场中心（广场约 36.0616,120.3798）。",
-        "source": "大众点评/携程：香港中路65号，燕儿岛路书城对面；OSM 新华书店 36.06531,120.39681（WGS84）",
-        "osmLink": "https://www.openstreetmap.org/?mlat=36.065314&mlon=120.396813#map=16/36.06531/120.39681"
-      },
       {
         "id": "13-haitian",
         "name": "老杰克·海天MALL店（候选）",
@@ -308,12 +296,12 @@
         "precision": "area-ref",
         "radiusM": 80,
         "address": "市南区香港西路48号海天MALL（资料写 G08 / LG）",
-        "note": "候选，不是已指定目的地。针点为 OSM 海天MALL，是商场位置，不是铺位实测。",
+        "note": "行程默认分店。针点为 OSM 海天MALL，是商场位置，不是铺位实测。营业与正餐供应待行前核实。",
         "source": "公开目录 OLD JACK CAFE（青岛海天MALL店）；OSM 海天MALL 36.05657,120.36426（WGS84）",
         "osmLink": "https://www.openstreetmap.org/?mlat=36.056569&mlon=120.364257#map=16/36.05657/120.36426"
       }
     ],
-    "searchLink": "https://www.openstreetmap.org/search?query=%E8%80%81%E6%9D%B0%E5%85%8B%E9%85%92%E9%A6%86%20%E9%9D%92%E5%B2%9B"
+    "searchLink": "https://www.openstreetmap.org/search?query=%E8%80%81%E6%9D%B0%E5%85%8B%20%E6%B5%B7%E5%A4%A9MALL%20%E9%9D%92%E5%B2%9B"
   },
   {
     "id": "14",
@@ -1702,29 +1690,17 @@
     "category": "food",
     "precision": "candidate",
     "hideDot": true,
-    "note": "【用户文档】写作「众品锅贴」。\n【2026-11-24 核验】公开品牌名是「众品老方子锅贴甜沫」，与文档简称相符，但不是店名一字不差。资料称青岛门店很多（有文章写十多家），绝不能默认一家。已核到并上图的候选：延吉路青岛市图书馆一带（资料写总店在延吉路图书馆东北108号，未落到108号门牌）；栈桥店广西路57号；台东店和兴路59号。另有「延安三路111号旗舰店」等，因延安三路很长、111号未核到路段，未上图以免标错。人民路 OSM「众品老方子锅贴」节点仍作参考线索，不单独当作已选店。",
-    "source": "地方美食稿列出总店/旗舰/栈桥/台东等地址（只用文字，不用高德坐标）。核验日期 2026-11-24。OSM 青岛市图书馆、广西路、和兴路 WGS84。",
-    "searchQuery": "众品老方子锅贴 青岛",
+    "note": "【用户文档】写作「众品锅贴」。\n【2026-11-24 核验】公开品牌名是「众品老方子锅贴甜沫」。按行程计划只保留广西路栈桥店（广西路57号）；资料中曾有延吉路图书馆一带、台东和兴路等其他门店，已按计划精简分支删除上图分店。",
+    "source": "美食稿栈桥店广西路57号；OSM 广西路 WGS84。核验日期 2026-11-24。",
+    "searchQuery": "众品老方子锅贴 广西路 青岛",
     "status": "doc",
-    "searchLink": "https://www.openstreetmap.org/search?query=%E4%BC%97%E5%93%81%E9%94%85%E8%B4%B4%20%E9%9D%92%E5%B2%9B",
+    "searchLink": "https://www.openstreetmap.org/search?query=%E4%BC%97%E5%93%81%E9%94%85%E8%B4%B4%20%E5%B9%BF%E8%A5%BF%E8%B7%AF%20%E9%9D%92%E5%B2%9B",
     "foodKind": "restaurant",
     "docSection": "饭店",
     "verifiedDate": "2026-11-24",
     "verifyStatus": "range",
-    "address": "「众品老方子锅贴甜沫」在青岛有多家，文档只写「众品锅贴」，未指定分店",
+    "address": "市南区广西路57号（栈桥店）",
     "candidates": [
-      {
-        "id": "81-lib",
-        "name": "众品·延吉路图书馆一带（候选）",
-        "lat": 36.086185,
-        "lon": 120.370207,
-        "precision": "area-ref",
-        "radiusM": 150,
-        "address": "资料写延吉路图书馆东北108号（总店），门牌未在 OSM 落到",
-        "note": "候选。针点为 OSM 青岛市图书馆（延吉路109号），是「图书馆一带」参考，不是108号店门。",
-        "source": "美食稿「总店：延吉路图书馆东北108号」；OSM 图书馆 way/556957577 WGS84",
-        "osmLink": "https://www.openstreetmap.org/?mlat=36.086185&mlon=120.370207#map=16/36.08619/120.37021"
-      },
       {
         "id": "81-gx",
         "name": "众品·广西路栈桥店（候选）",
@@ -1733,21 +1709,9 @@
         "precision": "area-ref",
         "radiusM": 80,
         "address": "市南区广西路57号",
-        "note": "候选。针点为近栈桥的广西路路段，不是57号门牌实测。",
+        "note": "行程默认分店。针点为近栈桥的广西路路段，不是57号门牌实测。",
         "source": "美食稿栈桥店广西路57号；OSM 广西路 WGS84",
         "osmLink": "https://www.openstreetmap.org/?mlat=36.063397&mlon=120.315332#map=16/36.06340/120.31533"
-      },
-      {
-        "id": "81-td",
-        "name": "众品·和兴路台东店（候选）",
-        "lat": 36.08355,
-        "lon": 120.350452,
-        "precision": "area-ref",
-        "radiusM": 80,
-        "address": "市北区和兴路59号",
-        "note": "候选。针点为 OSM 和兴路台东段，不是59号门牌实测。",
-        "source": "美食稿台东店和兴路59号；OSM 和兴路 WGS84",
-        "osmLink": "https://www.openstreetmap.org/?mlat=36.083550&mlon=120.350452#map=16/36.08355/120.35045"
       }
     ]
   },
@@ -1758,28 +1722,17 @@
     "category": "food",
     "precision": "candidate",
     "hideDot": true,
-    "note": "【用户文档】写作「海平馄饨」。\n【2026-11-24 核验】公开目录同时有「海萍馄饨」和「海平馄饨」。海萍：市南区郓城北路1号4单元101户（OSM 亦有「海萍馄饨」节点）；湖北路（河南路交叉口西北、资料写百盛后侧）；市北区胶州路37号。海平：逍遥花园店、逍遥二路店（逍遥二路生活家市场近侧门）。尚未有足够证据断定两套店名就是同一品牌，故都列为候选并注明用字，不默认郓城北路那家。图上标出能对应到 OSM 街道或已有节点的几处，作为范围/约略参考。",
-    "source": "好位置、Trip.com 海萍馄饨各店；携程/高德目录有海平馄饨逍遥花园店、逍遥二路店（不用高德坐标）。OSM node/13430601189 海萍馄饨。核验日期 2026-11-24。",
-    "searchQuery": "海萍馄饨 海平馄饨 青岛",
+    "note": "【用户文档】写作「海平馄饨」。\n【2026-11-24 核验】公开目录同时有「海萍」「海平」用字。按行程计划只保留湖北路店作近备选；郓城北路、逍遥二路等其他上图分店已按计划精简删除。针点为湖北路/安徽路一带，不是店门实测。",
+    "source": "Trip.com 海萍馄饨（湖北路店）；OSM 湖北路 WGS84。核验日期 2026-11-24。",
+    "searchQuery": "海萍馄饨 湖北路 青岛",
     "status": "doc",
-    "searchLink": "https://www.openstreetmap.org/search?query=%E6%B5%B7%E5%B9%B3%E9%A6%84%E9%A5%A8%20%E9%9D%92%E5%B2%9B",
+    "searchLink": "https://www.openstreetmap.org/search?query=%E6%B5%B7%E8%90%8D%E9%A6%84%E9%A5%A8%20%E6%B9%96%E5%8C%97%E8%B7%AF%20%E9%9D%92%E5%B2%9B",
     "foodKind": "restaurant",
     "docSection": "饭店",
     "verifiedDate": "2026-11-24",
     "verifyStatus": "range",
-    "address": "目录里同时出现「海平」「海萍」两字，且有多家，不能当成一字之差就合并，也不能只标一家",
+    "address": "市南区湖北路（资料写河南路与湖北路交叉口西北、百盛后侧）",
     "candidates": [
-      {
-        "id": "82-yc",
-        "name": "海萍馄饨·郓城北路店（候选）",
-        "lat": 36.06034,
-        "lon": 120.300966,
-        "precision": "approx",
-        "address": "市南区郓城北路1号4单元101户",
-        "note": "候选。针点为 OSM 同名「海萍馄饨」节点，与文档「海平」用字不同，未当作已确认的同一店。",
-        "source": "好位置；OSM node/13430601189 WGS84",
-        "osmLink": "https://www.openstreetmap.org/?mlat=36.060340&mlon=120.300966#map=16/36.06034/120.30097"
-      },
       {
         "id": "82-hb",
         "name": "海萍馄饨·湖北路店（候选）",
@@ -1788,21 +1741,9 @@
         "precision": "area-ref",
         "radiusM": 120,
         "address": "市南区湖北路，资料写河南路与湖北路交叉口西北（百盛后侧）",
-        "note": "候选。针点为湖北路/安徽路一带，不是店门实测。",
+        "note": "行程近备选分店。针点为湖北路/安徽路一带，不是店门实测。",
         "source": "Trip.com 海萍馄饨（湖北路店）；OSM 湖北路 WGS84",
         "osmLink": "https://www.openstreetmap.org/?mlat=36.065650&mlon=120.316050#map=16/36.06565/120.31605"
-      },
-      {
-        "id": "82-xy",
-        "name": "海平馄饨·逍遥二路一带（候选）",
-        "lat": 36.074415,
-        "lon": 120.40046,
-        "precision": "area-ref",
-        "radiusM": 200,
-        "address": "市南区逍遥二路（资料有逍遥花园店、逍遥二路店两种写法）",
-        "note": "候选。针点为 OSM 逍遥二路路段，门牌和「花园店/二路店」关系未细核。",
-        "source": "携程海平馄饨（逍遥二路店）等；OSM 逍遥二路 WGS84",
-        "osmLink": "https://www.openstreetmap.org/?mlat=36.074415&mlon=120.400460#map=16/36.07442/120.40046"
       }
     ]
   },
