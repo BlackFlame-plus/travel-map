@@ -16,7 +16,7 @@ const CATS = [
 ] as const
 
 const query = ref('')
-const planMode = ref(true)
+const planMode = ref(false)
 const contentStatus = ref('awaiting-planner')
 const skipHints = ref<string[]>([])
 const catOn = reactive({

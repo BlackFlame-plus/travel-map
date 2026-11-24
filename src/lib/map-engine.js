@@ -86,8 +86,8 @@ if (typeof window !== "undefined") {
     fallbackOn: false,
     panelOpen: true,
     viewKey: "play",
-    /** 计划模式默认开；关则完整浏览 places */
-    planMode: true,
+    /** 计划模式默认关；开则按 trip-plan 当日节点筛选 */
+    planMode: false,
     planDayId: (tripPlan.days && tripPlan.days[0] && tripPlan.days[0].id) || null,
     /** 当日画路线时跳过的提示（无坐标节点等） */
     planSkipHints: []
@@ -1531,7 +1531,7 @@ if (typeof window !== "undefined") {
     bindUi();
     map.invalidateSize();
     fitView("play", { animate: false });
-    /* 计划默认开：按当日节点过滤点位（空行程则先不显示全库点） */
+    /* 按当前 planMode 过滤点位（默认关=全库；开且空行程则不显示全库点） */
     refreshVisibility();
     requestBase(OUTLINE_NAME, "init");
     syncOutlineZoom();

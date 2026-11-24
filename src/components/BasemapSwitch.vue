@@ -11,8 +11,8 @@ type DayBrief = { id: string; label: string }
 const current = ref<'ofm' | 'outline'>('outline')
 const showNames = ref(true)
 const showAreas = ref(true)
-/** 默认开启计划模式 */
-const planMode = ref(true)
+/** 默认关闭计划模式 */
+const planMode = ref(false)
 const dayId = ref('')
 const days = ref<DayBrief[]>([])
 
