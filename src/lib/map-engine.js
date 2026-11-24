@@ -248,12 +248,17 @@ if (typeof window !== "undefined") {
   /**
    * 重画当日主路线。图层独立于底图，切街道图/轮廓不丢。
    * 只画 segments 声明的节点间连线；optional 餐饮不进主线。
+   *
+   * DRAW_PLAN_ROUTES=false：用户反馈示意路线效果差，暂不在地图上画连线；
+   * trip-plan.json 内 segments 数据保留，便于日后重新开启。
    */
+  var DRAW_PLAN_ROUTES = false;
+
   function redrawPlanRoutes() {
     if (!layers.planRoutes) return;
     layers.planRoutes.clearLayers();
     state.planSkipHints = [];
-    if (!state.planMode) {
+    if (!state.planMode || !DRAW_PLAN_ROUTES) {
       emitPlanState();
       return;
     }

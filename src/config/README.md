@@ -120,7 +120,7 @@ npm run validate:trip-plan
 - **不要**加 Day0 / Day4 假装抵达/返程游玩日。
 - 现行内容见 `trip-plan.json`（`contentStatus: draft`）与说明 `trip-plan.notes.md`。
 - 陈记食集 `placeId: "10"` 只进 `exclusions`，不删 places。
-- 老杰克仅 Day2 `13-haitian`（香港中路分店已删）；威尔德等无默认主选的多分店仍待选保留。
+- 老杰克只保留香港中路店 `13-hk65`（海天MALL店已删）；行程上仅 Day3 正餐后 optional，不作晚饭主选。威尔德等无默认主选的多分店仍待选保留。
 - 无坐标就近饭点：`primaryPlaceIds: []`，**不作** segment 端点；可选景点/餐饮只进 `optionalPlaceIds`。
 - 小麦岛不画默认连线（仅说明中的独立可选项）。
 
