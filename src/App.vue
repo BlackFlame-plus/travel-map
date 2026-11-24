@@ -1,16 +1,13 @@
 <script setup lang="ts">
 /**
- * 页面骨架。SidePanel 用 ref，供地图选中地点时在 H5 拉开面板。
+ * 页面骨架。
+ * 点地图地点只开左上角详情卡；H5 底部清单抽屉需用户手动点开。
  */
-import { provide, ref } from 'vue'
 import AppHeader from './components/AppHeader.vue'
 import TravelMap from './components/TravelMap.vue'
 import SidePanel from './components/SidePanel.vue'
 import BasemapSwitch from './components/BasemapSwitch.vue'
 import TileBanner from './components/TileBanner.vue'
-
-const sidePanelRef = ref<{ openPanel: () => void } | null>(null)
-provide('openSidePanel', () => sidePanelRef.value?.openPanel?.())
 </script>
 
 <template>
@@ -23,8 +20,8 @@ provide('openSidePanel', () => sidePanelRef.value?.openPanel?.())
     <BasemapSwitch />
     <div id="coverage-note">虚线框内为已加载的离线陆海；框外是未加载范围，不是海。</div>
     <TileBanner />
-    <!-- PC：引擎会把本节点挪进 #map，做成右上角悬浮详情卡；H5 贴在底栏上方 -->
+    <!-- 引擎挪进 #map：左上角悬浮详情卡 -->
     <div id="detail" class="detail-card" aria-live="polite" />
-    <SidePanel ref="sidePanelRef" />
+    <SidePanel />
   </div>
 </template>

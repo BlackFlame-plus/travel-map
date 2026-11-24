@@ -911,20 +911,13 @@ if (typeof window !== "undefined") {
     return null;
   }
 
-  var uiHooks = { onRequestOpenPanel: null };
-
   function selectItem(id, fly) {
     var found = findPlace(id);
     if (!found) return;
     state.selected = id;
     renderList();
     renderDetail(found);
-    if (isMobile()) {
-      state.panelOpen = true;
-      if (typeof uiHooks.onRequestOpenPanel === "function") {
-        uiHooks.onRequestOpenPanel();
-      }
-    }
+    /* 点地图地点：只开详情悬浮卡，不自动拉开 H5 底部清单抽屉 */
     if (fly) {
       if (found.parent.candidates && found.parent.candidates.length && found.item === found.parent) {
         var b = L.latLngBounds(found.parent.candidates.map(function (c) { return [c.lat, c.lon]; }));
@@ -1196,14 +1189,12 @@ if (typeof window !== "undefined") {
 
   /**
    * 对外入口。TravelMap.vue：
-   *   onMounted → bootQingdaoMap({ onRequestOpenPanel })
+   *   onMounted → bootQingdaoMap()
    *   onBeforeUnmount → handle.destroy()
    *
    * 返回的 API 供 Vue（Element Plus 侧栏 / 底图按钮）调用，不再手写 DOM 绑定。
    */
-  export function bootQingdaoMap(options) {
-    options = options || {};
-    uiHooks.onRequestOpenPanel = options.onRequestOpenPanel || null;
+  export function bootQingdaoMap() {
     setupMaplibreWorker();
     init();
     return {
