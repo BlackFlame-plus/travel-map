@@ -203,7 +203,7 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
 .badge.exact { background: #dceee8; color: #1d5c45; }
 .badge.ref { background: #f3ead0; color: #6a5310; }
 .badge.cand { background: #e8dff3; color: #55307a; }
-/* 地点详情：PC 地图右上悬浮卡；H5 贴底栏上方 */
+/* 地点详情：贴地图左上角悬浮卡（让出左侧缩放以外的空间；右上留给底图切换） */
 #detail {
   display: none;
   box-sizing: border-box;
@@ -212,7 +212,8 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
   display: block;
   position: absolute;
   top: 10px;
-  right: 118px; /* 让出右侧底图切换 + 缩放条 */
+  left: 10px;
+  right: auto;
   z-index: 1100;
   width: min(360px, calc(100% - 140px));
   max-height: min(70vh, 560px);
@@ -347,14 +348,14 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
     top: 88px;
     right: 8px;
   }
-  /* H5：详情卡贴在底部握把上方，避免挡控件 */
+  /* H5：同样贴左上，避开右侧底图切换与底部握把 */
   #map #detail.open {
-    top: auto;
-    right: 8px;
+    top: 10px;
     left: 8px;
-    bottom: calc(52px + var(--safe-b));
-    width: auto;
-    max-height: 38vh;
+    right: auto;
+    bottom: auto;
+    width: min(320px, calc(100% - 100px));
+    max-height: min(42vh, calc(100% - 60px - var(--safe-b)));
   }
 }
 @media (max-width: 360px) {

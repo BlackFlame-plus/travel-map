@@ -287,7 +287,14 @@ if (typeof window !== "undefined") {
 
     if (name === OUTLINE_NAME) {
       showOutlineLayer();
-      showBanner("已使用内置地理轮廓（离线，不请求在线瓦片）。", false);
+      /* 内置轮廓为默认态，不再弹黄条提示 */
+      hideBannerSoft();
+      var bannerEl = $("tile-banner");
+      if (bannerEl) {
+        bannerEl.classList.remove("show");
+        bannerEl.dataset.sticky = "0";
+        bannerEl.innerHTML = "";
+      }
       return gen;
     }
 
