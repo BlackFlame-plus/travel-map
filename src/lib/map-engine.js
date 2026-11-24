@@ -1135,8 +1135,19 @@ if (typeof window !== "undefined") {
       }
 
       var prims = node.primaryPlaceIds || [];
+      var opts = (node.optionalPlaceIds || []).filter(function (pid) {
+        if (planExcludedIds()[pid]) return false;
+        var pl = placeById(pid);
+        return pl && state.catOn[pl.category];
+      });
+      var hasMeal = !!(node.meal && (node.meal.kind || node.meal.note));
+
       if (!prims.length) {
-        html += '<p class="hint plan-pending-meal">就近待选（无坐标主锚，不作路线端点；属草案真实缺项）。</p>';
+        if (opts.length && !hasMeal) {
+          html += '<p class="hint plan-pending-meal">无默认主选——下列仅为备选/替换，不进默认路线、不画连线。</p>';
+        } else {
+          html += '<p class="hint plan-pending-meal">就近待选（无坐标主锚，不作路线端点；属草案真实缺项）。</p>';
+        }
       } else {
         html += '<div class="plan-sub">主选</div>';
         var primCount = 0;
@@ -1154,11 +1165,6 @@ if (typeof window !== "undefined") {
         if (!primCount) html += '<p class="hint">本节点主选被类型筛选隐藏。</p>';
       }
 
-      var opts = (node.optionalPlaceIds || []).filter(function (pid) {
-        if (planExcludedIds()[pid]) return false;
-        var pl = placeById(pid);
-        return pl && state.catOn[pl.category];
-      });
       if (opts.length) {
         html += '<details class="plan-optional"><summary>可选（替换/备选，不进默认路线）' +
           '<span class="acc-count">' + opts.length + "</span></summary>";
