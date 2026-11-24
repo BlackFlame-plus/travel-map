@@ -340,7 +340,8 @@ if (typeof window !== "undefined") {
   function itemVisible(rec) {
     var p = rec.parent;
     var it = rec.item;
-    if (!state.catOn[p.category]) return false;
+    var cat = effectiveCategory(p, it);
+    if (!state.catOn[cat]) return false;
     if (planExcludedIds()[it.id] || planExcludedIds()[p.id]) {
       if (state.planMode) return false;
     }
@@ -766,8 +767,16 @@ if (typeof window !== "undefined") {
   }
 
   /* ========== 标记点（圆点 / 约略虚线圈 / 偏移指引线）========== */
+  /** 子点可自带 category，否则继承父级 */
+  function effectiveCategory(parent, item) {
+    var it = item || parent;
+    if (it && it.category && CATS[it.category]) return it.category;
+    if (parent && parent.category && CATS[parent.category]) return parent.category;
+    return "scenic";
+  }
+
   function colorOf(rec) {
-    return (CATS[rec.parent.category] || CATS.scenic).color;
+    return (CATS[effectiveCategory(rec.parent, rec.item)] || CATS.scenic).color;
   }
 
   /** 遍历 allMapItems，创建圆点并写入 featureIndex */
@@ -1056,21 +1065,77 @@ if (typeof window !== "undefined") {
     return true;
   }
 
-  function renderPlaceItem(p) {
-    var color = (CATS[p.category] || CATS.scenic).color;
-    var active = state.selected === p.id || (p.candidates || []).some(function (c) { return c.id === state.selected; });
-    var html = '<div class="item' + (active ? " active" : "") + '" data-id="' + p.id + '">';
+  /** 列表一行：主点或子点；颜色/类别用 effectiveCategory */
+  function renderPlaceItemRow(parent, item, isCand) {
+    var cat = effectiveCategory(parent, item);
+    var color = (CATS[cat] || CATS.scenic).color;
+    var id = item.id;
+    var active = state.selected === id ||
+      (!isCand && (parent.candidates || []).some(function (c) { return c.id === state.selected; }));
+    var title = isCand
+      ? (parent.num + "　" + item.name)
+      : (parent.num + "　" + parent.name);
+    var prec = item.precision || parent.precision;
+    var html = '<div class="item' + (active ? " active" : "") + '" data-id="' + escapeHtml(id) + '">';
     html += '<span class="dot" style="color:' + color + ';background:' + color + '"></span>';
-    html += "<div><div class=\"name\">" + escapeHtml(p.num + "　" + p.name) +
-      precBadge(p.precision) + "</div>";
+    html += "<div><div class=\"name\">" + escapeHtml(title) +
+      precBadge(prec);
+    if (isCand && item.category && item.category !== parent.category) {
+      html += ' <span class="meta">· ' + escapeHtml((CATS[cat] || {}).label || cat) + "</span>";
+    }
+    html += "</div>";
     html += '<div class="meta">' +
-      (p.address ? escapeHtml(p.address) : "") + "</div></div></div>";
+      (item.address || parent.address ? escapeHtml(item.address || parent.address) : "") +
+      "</div></div></div>";
     return html;
+  }
+
+  function renderPlaceItem(p) {
+    /* hideDot 父级：侧栏以父级为头，展开子地点（各显示名称与类别色） */
+    if (p.hideDot && p.candidates && p.candidates.length) {
+      var html = "";
+      var headColor = (CATS[p.category] || CATS.scenic).color;
+      var anySel = state.selected === p.id ||
+        p.candidates.some(function (c) { return c.id === state.selected; });
+      html += '<div class="item branch-head' + (anySel ? " active" : "") + '" data-id="' +
+        escapeHtml(p.id) + '">';
+      html += '<span class="dot" style="color:' + headColor + ';background:' + headColor + '"></span>';
+      html += "<div><div class=\"name\">" + escapeHtml(p.num + "　" + p.name) +
+        precBadge(p.precision) + "</div>";
+      html += '<div class="meta">' +
+        (p.address ? escapeHtml(p.address) : "子地点见下方") + "</div></div></div>";
+      p.candidates.forEach(function (c) {
+        if (!itemVisible({ parent: p, item: c, isCand: true })) return;
+        html += renderPlaceItemRow(p, c, true);
+      });
+      return html;
+    }
+    return renderPlaceItemRow(p, p, false);
   }
 
   function placeById(id) {
     var found = findPlace(id);
     return found ? found.parent : null;
+  }
+
+  /** 计划清单用：解析 id 到 {parent,item}；过滤看子点自身 category */
+  function resolvePlanListEntries(pid) {
+    var found = findPlace(pid);
+    if (!found) return [];
+    var p = found.parent;
+    var it = found.item;
+    /* 引用 hideDot 父级（如 15）→ 展开全部可见子点 */
+    if (!found.isCand && p.hideDot && p.candidates && p.candidates.length) {
+      return p.candidates
+        .filter(function (c) {
+          if (planExcludedIds()[c.id]) return false;
+          return !!state.catOn[effectiveCategory(p, c)];
+        })
+        .map(function (c) { return { parent: p, item: c, isCand: true }; });
+    }
+    if (planExcludedIds()[it.id] || planExcludedIds()[p.id]) return [];
+    if (!state.catOn[effectiveCategory(p, it)]) return [];
+    return [{ parent: p, item: it, isCand: found.isCand }];
   }
 
   /** 长说明默认截断，点「展开」看全文（不改策划原文） */
@@ -1140,15 +1205,14 @@ if (typeof window !== "undefined") {
       }
 
       var prims = node.primaryPlaceIds || [];
-      var opts = (node.optionalPlaceIds || []).filter(function (pid) {
-        if (planExcludedIds()[pid]) return false;
-        var pl = placeById(pid);
-        return pl && state.catOn[pl.category];
+      var optEntries = [];
+      (node.optionalPlaceIds || []).forEach(function (pid) {
+        resolvePlanListEntries(pid).forEach(function (e) { optEntries.push(e); });
       });
       var hasMeal = !!(node.meal && (node.meal.kind || node.meal.note));
 
       if (!prims.length) {
-        if (opts.length && !hasMeal) {
+        if (optEntries.length && !hasMeal) {
           html += '<p class="hint plan-pending-meal">无默认主选——下列仅为备选/替换，不进默认路线、不画连线。</p>';
         } else {
           html += '<p class="hint plan-pending-meal">就近待选（无坐标主锚，不作路线端点；属草案真实缺项）。</p>';
@@ -1157,26 +1221,27 @@ if (typeof window !== "undefined") {
         html += '<div class="plan-sub">主选</div>';
         var primCount = 0;
         prims.forEach(function (pid) {
-          if (planExcludedIds()[pid]) return;
-          var pl = placeById(pid);
-          if (!pl) {
-            html += '<p class="hint">未知地点 id：' + escapeHtml(pid) + "</p>";
+          var entries = resolvePlanListEntries(pid);
+          if (!entries.length) {
+            if (!findPlace(pid)) {
+              html += '<p class="hint">未知地点 id：' + escapeHtml(pid) + "</p>";
+            }
             return;
           }
-          if (!state.catOn[pl.category]) return;
-          primCount += 1;
-          html += renderPlaceItem(pl);
+          entries.forEach(function (e) {
+            primCount += 1;
+            html += renderPlaceItemRow(e.parent, e.item, e.isCand);
+          });
         });
         if (!primCount) html += '<p class="hint">本节点主选被类型筛选隐藏。</p>';
       }
 
-      if (opts.length) {
+      if (optEntries.length) {
         html += '<details class="plan-optional"><summary>可选（替换/备选，不进默认路线）' +
-          '<span class="acc-count">' + opts.length + "</span></summary>";
+          '<span class="acc-count">' + optEntries.length + "</span></summary>";
         html += '<div class="list-acc-body">';
-        opts.forEach(function (pid) {
-          var pl = placeById(pid);
-          if (pl) html += renderPlaceItem(pl);
+        optEntries.forEach(function (e) {
+          html += renderPlaceItemRow(e.parent, e.item, e.isCand);
         });
         html += "</div></details>";
       }
@@ -1305,10 +1370,11 @@ if (typeof window !== "undefined") {
     var el = $("detail");
     if (!el) return;
     var prec = it.precision || p.precision;
+    var cat = effectiveCategory(p, it);
     var html = '<div class="detail-card-head"><h2>' + escapeHtml(p.num + "  " + (it.name || p.name)) +
       '</h2><button type="button" class="detail-close" aria-label="关闭详情">×</button></div>';
     html += "<p>" + precBadge(prec) + verifyBadge(p.verifyStatus) +
-      ' <span class="meta">' + escapeHtml((CATS[p.category] || {}).label || "") + "</span></p>";
+      ' <span class="meta">' + escapeHtml((CATS[cat] || {}).label || "") + "</span></p>";
     if (p.verifiedDate) {
       html += '<p class="src">核验日期：' + escapeHtml(p.verifiedDate) + "（Asia/Shanghai）</p>";
     }
@@ -1335,11 +1401,16 @@ if (typeof window !== "undefined") {
     }
     html += '<p class="src">来源：' + escapeHtml(it.source || p.source || "") + "</p>";
     if (p.candidates && p.candidates.length && !found.isCand) {
-      html += '<div class="section-title">候选位置（未指定去哪一处）</div><div id="cand-mini">';
+      html += '<div class="section-title">子地点 / 候选</div><div id="cand-mini">';
       p.candidates.forEach(function (c) {
+        var cCat = effectiveCategory(p, c);
         html += '<div class="item" data-id="' + c.id + '"><span class="dot" style="background:' +
-          (CATS[p.category].color) + '"></span><div><div class="name">' + escapeHtml(c.name) +
-          precBadge(c.precision) + '</div><div class="meta">' + escapeHtml(c.address || "") +
+          (CATS[cCat] || CATS.scenic).color + '"></span><div><div class="name">' + escapeHtml(c.name) +
+          precBadge(c.precision) +
+          (c.category && c.category !== p.category
+            ? ' <span class="meta">· ' + escapeHtml((CATS[cCat] || {}).label || cCat) + "</span>"
+            : "") +
+          '</div><div class="meta">' + escapeHtml(c.address || "") +
           "</div></div></div>";
       });
       html += "</div>";

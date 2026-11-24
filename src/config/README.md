@@ -6,7 +6,7 @@ JSON **不能写注释**，所以字段含义写在本文件。日常改地点�
 
 | 文件 | 要不要常改 | 作用 |
 |------|------------|------|
-| `places.json` | **主数据** | 94 个地点 + 嵌套候选店（真坐标只维护在这里） |
+| `places.json` | **主数据** | 93 个主地点 + 嵌套候选/子地点（真坐标只维护在这里） |
 | `trip-plan.json` | **行程** | 每日节点 / 路段 / 排除项；只引用 places 全局 id |
 | `map-meta.json` | 偶尔 | 视图范围、区域名、高亮线、行程说明文案 |
 | `marker-offsets.json` | 很少 | 两个点坐标太近时，图上错开显示的偏移量 |
@@ -83,9 +83,9 @@ npm run validate:trip-plan
 | `note` | 备注（支持 `\n` 换行）。 |
 | `source` | 坐标/信息来源，方便以后核对。 |
 | `label` | 若填写，地图常显名优先用它，而不是 `name`。 |
-| `hideDot` | `true` 时主点不上图（只靠 `candidates` 显示分店时有用）。 |
+| `hideDot` | `true` 时主点不上图（只靠 `candidates` 显示分店/子地点时有用）。 |
 | `foodKind` | 餐饮细分（可选，纯备注用）。 |
-| `candidates` | 同一条目下的分店/候选点数组，字段与主点类似（`id/name/lat/lon/...`）。 |
+| `candidates` | 同一条目下的分店/候选/子地点数组（`id/name/lat/lon/...`）。可选 `category`（与主点相同枚举），未填则继承父级；地图颜色与类型筛选用 `item.category \|\| parent.category`。 |
 
 ### 新增一个地点的最短步骤
 

@@ -2,9 +2,9 @@
  * 校验 places.json 是否还能被地图引擎正常吃进去。
  *
  * 检查项：
- * - 正好 94 条主地点（若你故意增删，改下面的期望数量）
- * - id 全局唯一（含 candidates）；当前期望 115 个 id（按计划精简多分店后）
- * - category / precision 落在允许枚举内
+ * - 正好 93 条主地点（中山路子地点合并后；若你故意增删，改下面的期望数量）
+ * - id 全局唯一（含 candidates）；当前期望 121 个 id
+ * - category / precision 落在允许枚举内（候选可选自带 category）
  * - 非 pending、且未 hideDot 的点必须有 lat/lon
  *
  * 用法：npm run validate:places
@@ -26,8 +26,8 @@ function fail(msg) {
   errors += 1
 }
 
-const EXPECTED_PLACE_COUNT = 94
-const EXPECTED_ID_COUNT = 115
+const EXPECTED_PLACE_COUNT = 93
+const EXPECTED_ID_COUNT = 121
 
 if (!Array.isArray(places) || places.length !== EXPECTED_PLACE_COUNT) {
   fail(`expected ${EXPECTED_PLACE_COUNT} places, got ${places?.length}`)
@@ -47,6 +47,12 @@ for (const p of places) {
       if (!c.id) fail(`${p.id} candidate missing id`)
       if (ids.has(c.id)) fail(`duplicate candidate id ${c.id}`)
       ids.add(c.id)
+      if (c.category != null && !CATS.has(c.category)) {
+        fail(`${c.id} bad candidate category ${c.category}`)
+      }
+      if (c.precision != null && !PREC.has(c.precision)) {
+        fail(`${c.id} bad candidate precision ${c.precision}`)
+      }
     }
   }
 }

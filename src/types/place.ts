@@ -31,14 +31,24 @@ export interface PlaceCandidate {
   /** 全局唯一；不要和主地点或其他候选重复 */
   id: string
   name: string
+  /**
+   * 可选；与主点相同枚举。未填则继承父级 category。
+   * 用于中山路等混合 scenic/culture/food 子点。
+   */
+  category?: PlaceCategory
+  precision?: PlacePrecision
   /** WGS84 纬度；没有坐标就不要上图 */
   lat?: number | null
   /** WGS84 经度 */
   lon?: number | null
   address?: string
   note?: string
+  source?: string
   /** 若填了，地图常显名优先用这个 */
   label?: string
+  radiusM?: number
+  osmLink?: string
+  searchLink?: string
   [key: string]: unknown
 }
 
