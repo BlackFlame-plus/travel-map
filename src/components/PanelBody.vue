@@ -7,15 +7,6 @@ import { onMounted, reactive, ref } from 'vue'
 import { Search } from '@element-plus/icons-vue'
 import { getMapApi } from '../lib/map-bridge.js'
 
-const VIEWS = [
-  { key: 'play', label: '游玩区' },
-  { key: 'urban', label: '市区' },
-  { key: 'full', label: '全域' },
-  { key: 'oldtown', label: '老城放大' },
-  { key: 'east', label: '东部岸线' },
-  { key: 'taiqing', label: '太清' },
-] as const
-
 const CATS = [
   { key: 'scenic', label: '景点' },
   { key: 'food', label: '餐饮' },
@@ -26,7 +17,6 @@ const CATS = [
 const query = ref('')
 const showNames = ref(true)
 const showAreas = ref(true)
-const viewKey = ref('play')
 const catOn = reactive({
   scenic: true,
   food: true,
@@ -43,19 +33,16 @@ function onSearch(val: string) {
   api()?.setQuery?.(val)
 }
 
-function onView(key: string) {
-  viewKey.value = key
-  api()?.fitView?.(key)
+function onNamesChange(val: boolean | string | number) {
+  const on = !!val
+  showNames.value = on
+  api()?.setShowNames?.(on)
 }
 
-function toggleNames() {
-  showNames.value = !showNames.value
-  api()?.setShowNames?.(showNames.value)
-}
-
-function toggleAreas() {
-  showAreas.value = !showAreas.value
-  api()?.setShowAreas?.(showAreas.value)
+function onAreasChange(val: boolean | string | number) {
+  const on = !!val
+  showAreas.value = on
+  api()?.setShowAreas?.(on)
 }
 
 function onCatChange(key: keyof typeof catOn, checked: boolean) {
@@ -71,35 +58,29 @@ onMounted(() => {
 
 <template>
   <div id="panel-body" class="panel-body">
-    <div class="tool-block">
-      <el-space wrap :size="6">
-        <el-button
-          v-for="v in VIEWS"
-          :key="v.key"
+    <div class="tool-block switch-row">
+      <div class="switch-item">
+        <span class="switch-label">地点名</span>
+        <el-switch
+          :model-value="showNames"
           size="small"
-          round
-          :type="viewKey === v.key ? 'primary' : 'default'"
-          @click="onView(v.key)"
-        >
-          {{ v.label }}
-        </el-button>
-        <el-button
+          inline-prompt
+          active-text="开"
+          inactive-text="关"
+          @change="onNamesChange"
+        />
+      </div>
+      <div class="switch-item">
+        <span class="switch-label">区域名</span>
+        <el-switch
+          :model-value="showAreas"
           size="small"
-          round
-          :type="showNames ? 'primary' : 'default'"
-          @click="toggleNames"
-        >
-          地点名
-        </el-button>
-        <el-button
-          size="small"
-          round
-          :type="showAreas ? 'primary' : 'default'"
-          @click="toggleAreas"
-        >
-          区域名
-        </el-button>
-      </el-space>
+          inline-prompt
+          active-text="开"
+          inactive-text="关"
+          @change="onAreasChange"
+        />
+      </div>
     </div>
 
     <el-input
@@ -159,6 +140,22 @@ onMounted(() => {
 }
 .tool-block {
   margin: 0 0 8px;
+}
+.switch-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 20px;
+  align-items: center;
+}
+.switch-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.switch-label {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--ink, #1c2a2e);
 }
 .search-input {
   margin-bottom: 8px;
