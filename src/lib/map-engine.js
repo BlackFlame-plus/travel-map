@@ -157,7 +157,7 @@ if (typeof window !== "undefined") {
   /* ========== 底图：只允许 OpenFreeMap 街道图 + 内置离线轮廓 ==========
      政策说明：OSM.org / OSM.de / OpenTopoMap 官方瓦片曾返回 403 拒绝图，
      本页不再请求它们，也不用代理/换域绕过。
-     用户点击 #basemap-switch 优先于启动时的默认 OFM 加载（用 switchGen 防竞态）。 */
+     默认启动内置轮廓；街道图仅用户点击后加载（switchGen 防竞态）。 */
   var wantedBase = "内置地理轮廓（离线）";
   var OUTLINE_NAME = "内置地理轮廓（离线）";
   var OFM_NAME = "街道图（OpenFreeMap）";
@@ -609,6 +609,35 @@ if (typeof window !== "undefined") {
       featureIndex[it.id] = rec;
       marker.addTo(layers.markers);
     });
+    syncHoverTips();
+  }
+
+  /**
+   * 「地点名」关闭时：鼠标悬停圆点弹出名称；
+   * 打开时常显标签已够用，解绑 tip 避免叠字。
+   */
+  function syncHoverTips() {
+    Object.keys(featureIndex).forEach(function (id) {
+      var rec = featureIndex[id];
+      var m = rec.marker;
+      if (!m) return;
+      if (state.showNames) {
+        if (m.getTooltip()) m.unbindTooltip();
+        return;
+      }
+      var tip = displayName(rec);
+      if (m.getTooltip()) {
+        m.setTooltipContent(tip);
+      } else {
+        m.bindTooltip(tip, {
+          direction: "top",
+          offset: [0, -8],
+          opacity: 0.95,
+          className: "qd-hover-tip",
+          sticky: true
+        });
+      }
+    });
   }
 
 
@@ -652,6 +681,7 @@ if (typeof window !== "undefined") {
         labelRoot.appendChild(el);
       });
     }
+    syncHoverTips();
     if (!state.showNames) return;
 
     var vis = [];
@@ -777,35 +807,72 @@ if (typeof window !== "undefined") {
     return "";
   }
 
+  function placePassesListFilter(p) {
+    var recs = [];
+    if (!p.hideDot && p.lat != null) recs.push({ parent: p, item: p, isCand: false });
+    (p.candidates || []).forEach(function (c) {
+      recs.push({ parent: p, item: c, isCand: true });
+    });
+    var any = recs.some(itemVisible) || (!recs.length && state.catOn[p.category]);
+    if (p.hideDot && p.candidates) {
+      any = recs.some(itemVisible);
+    }
+    if (!any) return false;
+    var q = state.query.trim().toLowerCase();
+    if (q && p.hideDot) {
+      var blob = [p.num, p.name, p.address, p.note].join(" ").toLowerCase();
+      if (!recs.some(itemVisible) && blob.indexOf(q) === -1) return false;
+    }
+    return true;
+  }
+
+  function renderPlaceItem(p) {
+    var color = (CATS[p.category] || CATS.scenic).color;
+    var active = state.selected === p.id || (p.candidates || []).some(function (c) { return c.id === state.selected; });
+    var html = '<div class="item' + (active ? " active" : "") + '" data-id="' + p.id + '">';
+    html += '<span class="dot" style="color:' + color + ';background:' + color + '"></span>';
+    html += "<div><div class=\"name\">" + escapeHtml(p.num + "　" + p.name) +
+      precBadge(p.precision) + "</div>";
+    html += '<div class="meta">' +
+      (p.address ? escapeHtml(p.address) : "") + "</div></div></div>";
+    return html;
+  }
+
+  /** 地点清单：按类型手风琴分组（景点 / 餐饮 / 酒馆 / 文创） */
   function renderList() {
     var box = $("list");
-    var html = "";
-    DATA.places.forEach(function (p) {
-      var recs = [];
-      if (!p.hideDot && p.lat != null) recs.push({ parent: p, item: p, isCand: false });
-      (p.candidates || []).forEach(function (c) {
-        recs.push({ parent: p, item: c, isCand: true });
-      });
-      var any = recs.some(itemVisible) || (!recs.length && state.catOn[p.category]);
-      /* text-only parent still filterable */
-      if (p.hideDot && p.candidates) {
-        any = recs.some(itemVisible);
-      }
-      if (!any) return;
-      var q = state.query.trim().toLowerCase();
-      if (q && p.hideDot) {
-        var blob = [p.num, p.name, p.address, p.note].join(" ").toLowerCase();
-        if (!recs.some(itemVisible) && blob.indexOf(q) === -1) return;
-      }
-      var color = (CATS[p.category] || CATS.scenic).color;
-      var active = state.selected === p.id || (p.candidates || []).some(function (c) { return c.id === state.selected; });
-      html += '<div class="item' + (active ? " active" : "") + '" data-id="' + p.id + '">';
-      html += '<span class="dot" style="color:' + color + ';background:' + color + '"></span>';
-      html += "<div><div class=\"name\">" + escapeHtml(p.num + "　" + p.name) +
-        precBadge(p.precision) + "</div>";
-      html += '<div class="meta">' + escapeHtml((CATS[p.category] || {}).label || "") +
-        (p.address ? " · " + p.address : "") + "</div></div></div>";
+    if (!box) return;
+
+    /* 重绘前记住哪些分组是展开的，避免筛选时全部收起 */
+    var wasOpen = {};
+    var hadAcc = false;
+    box.querySelectorAll("details.list-acc").forEach(function (d) {
+      hadAcc = true;
+      wasOpen[d.getAttribute("data-cat")] = d.open;
     });
+
+    var groups = { scenic: [], food: [], bar: [], culture: [] };
+    DATA.places.forEach(function (p) {
+      if (!placePassesListFilter(p)) return;
+      if (groups[p.category]) groups[p.category].push(p);
+    });
+
+    var html = "";
+    var catOrder = ["scenic", "food", "bar", "culture"];
+    catOrder.forEach(function (cat) {
+      var items = groups[cat];
+      if (!items.length) return;
+      var color = CATS[cat].color;
+      var openAttr = (!hadAcc || wasOpen[cat] !== false) ? " open" : "";
+      html += '<details class="list-acc" data-cat="' + cat + '"' + openAttr + ">";
+      html += '<summary><span class="dot" style="background:' + color + '"></span>' +
+        escapeHtml(CATS[cat].label) +
+        '<span class="acc-count">' + items.length + "</span></summary>";
+      html += '<div class="list-acc-body">';
+      items.forEach(function (p) { html += renderPlaceItem(p); });
+      html += "</div></details>";
+    });
+
     if (!html) html = '<p class="hint">没有符合当前筛选的地点。</p>';
     box.innerHTML = html;
     box.querySelectorAll(".item").forEach(function (el) {
@@ -859,11 +926,23 @@ if (typeof window !== "undefined") {
     layoutLabels();
   }
 
+  function closeDetail() {
+    var el = $("detail");
+    if (!el) return;
+    el.classList.remove("open");
+    el.innerHTML = "";
+    state.selected = null;
+    renderList();
+    layoutLabels();
+  }
+
   function renderDetail(found) {
     var p = found.parent, it = found.item;
     var el = $("detail");
+    if (!el) return;
     var prec = it.precision || p.precision;
-    var html = "<h2>" + escapeHtml(p.num + "  " + (it.name || p.name)) + "</h2>";
+    var html = '<div class="detail-card-head"><h2>' + escapeHtml(p.num + "  " + (it.name || p.name)) +
+      '</h2><button type="button" class="detail-close" aria-label="关闭详情">×</button></div>';
     html += "<p>" + precBadge(prec) + verifyBadge(p.verifyStatus) +
       ' <span class="meta">' + escapeHtml((CATS[p.category] || {}).label || "") + "</span></p>";
     if (p.verifiedDate) {
@@ -890,7 +969,7 @@ if (typeof window !== "undefined") {
       var q = encodeURIComponent(it.searchQuery || p.searchQuery || ((it.name || p.name) + " 青岛"));
       html += '<a href="https://www.openstreetmap.org/search?query=' + q + '" target="_blank" rel="noopener noreferrer">OSM 搜索</a></div>';
     }
-    html += '<p class="src">来源：' + escapeHtml(it.source || p.source || "") + "</p>";
+    html += '<p class="src">来源：' + escapeHtml(it.source || p.source || "") + "</p>';
     if (p.candidates && p.candidates.length && !found.isCand) {
       html += '<div class="section-title">候选位置（未指定去哪一处）</div><div id="cand-mini">';
       p.candidates.forEach(function (c) {
@@ -906,6 +985,13 @@ if (typeof window !== "undefined") {
     }
     el.innerHTML = html;
     el.classList.add("open");
+    var closeBtn = el.querySelector(".detail-close");
+    if (closeBtn) {
+      closeBtn.addEventListener("click", function (e) {
+        L.DomEvent.stop(e);
+        closeDetail();
+      });
+    }
     el.querySelectorAll("#cand-mini .item").forEach(function (n) {
       n.addEventListener("click", function (e) {
         e.stopPropagation();
@@ -973,6 +1059,7 @@ if (typeof window !== "undefined") {
   }
   function setShowNames(on) {
     state.showNames = !!on;
+    syncHoverTips();
     layoutLabels();
   }
   function setShowAreas(on) {
@@ -1009,7 +1096,7 @@ if (typeof window !== "undefined") {
     });
 
     map = L.map("map", {
-      zoomControl: true,
+      zoomControl: false,
       attributionControl: true,
       minZoom: 9,
       maxZoom: 18,
@@ -1017,6 +1104,8 @@ if (typeof window !== "undefined") {
       zoomDelta: 1,
       worldCopyJump: false
     });
+    /* 缩放放到右上，CSS 会排在底图切换按钮下方 */
+    L.control.zoom({ position: "topright" }).addTo(map);
     map.createPane("outlinePane");
     map.getPane("outlinePane").style.zIndex = QD_OUTLINE_RENDER.landPaneZ;
     map.getPane("outlinePane").style.pointerEvents = "none";
@@ -1031,7 +1120,8 @@ if (typeof window !== "undefined") {
     ofmLayer = makeOfmLayer();
     fallbackGroup.addTo(map);
     state.fallbackOn = true;
-    wantedBase = ofmLayer ? OFM_NAME : OUTLINE_NAME;
+    /* 默认用内置轮廓；街道图仅用户点「街道图」时再加载 */
+    wantedBase = OUTLINE_NAME;
     map.attributionControl.addAttribution('内置轮廓数据简化自 <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>');
     map.on("zoomend", syncOutlineZoom);
 
@@ -1050,6 +1140,12 @@ if (typeof window !== "undefined") {
     if (banner) map.getContainer().appendChild(banner);
     var switchEl = $("basemap-switch");
     if (switchEl) map.getContainer().appendChild(switchEl);
+    var detailEl = $("detail");
+    if (detailEl) {
+      map.getContainer().appendChild(detailEl);
+      L.DomEvent.disableClickPropagation(detailEl);
+      L.DomEvent.disableScrollPropagation(detailEl);
+    }
     syncBasemapButtons(wantedBase);
 
     map.on("move zoom zoomend moveend viewreset", layoutLabels);
@@ -1062,12 +1158,7 @@ if (typeof window !== "undefined") {
     fitView("play", { animate: false });
     renderList();
     layoutLabels();
-    if (ofmLayer) {
-      startDefaultOfm();
-    } else {
-      requestBase(OUTLINE_NAME, "init");
-      showBanner("未能初始化 MapLibre，已使用内置地理轮廓。OSM 官方瓦片已移除，不再请求。", true);
-    }
+    requestBase(OUTLINE_NAME, "init");
     syncOutlineZoom();
 
     /* Refit default/current view after the pane has its real size (PC and narrow). */

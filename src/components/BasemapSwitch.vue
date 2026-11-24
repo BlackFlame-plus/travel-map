@@ -5,7 +5,7 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { getMapApi, setBasemapHandler } from '../lib/map-bridge.js'
 
-const current = ref<'ofm' | 'outline'>('ofm')
+const current = ref<'ofm' | 'outline'>('outline')
 
 function pick(which: 'ofm' | 'outline') {
   current.value = which

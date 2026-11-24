@@ -138,14 +138,13 @@ onMounted(() => {
       :closable="false"
       show-icon
       class="hint-alert"
-      title="地点名默认常显；实心点多为精确位置，描边/虚线圈为约略范围。底图可在右上角切换街道图与内置轮廓。坐标 WGS84。"
+      title="地点名默认常显；关掉后鼠标悬停圆点可看名称。实心点多为精确位置，描边/虚线圈为约略范围。底图可在右上角切换。坐标 WGS84。"
     />
 
-    <!-- 引擎仍往这里灌 HTML（行程说明 / 清单 / 详情） -->
+    <!-- 引擎灌行程说明 / 清单；详情 #detail 已改成地图上的悬浮卡（见 App.vue） -->
     <div id="doc-guide" />
     <div class="section-title">地点清单</div>
     <div id="list" />
-    <div id="detail" />
   </div>
 </template>
 

@@ -105,15 +105,20 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
   max-width: 160px; overflow: hidden; text-overflow: ellipsis;
 }
 .place-label.approx-name { font-weight: 600; }
+/* 区域名：加大字号、降低不透明度，融入底图 */
 .area-label {
   position: absolute; pointer-events: none; white-space: nowrap;
-  color: #3a5260; font-weight: 700; letter-spacing: .12em;
-  text-shadow: 0 0 3px #fff, 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff, 0 0 8px #fff;
+  color: #3a5260; font-weight: 650; letter-spacing: .14em;
+  text-shadow:
+    0 0 6px rgba(255,255,255,.55),
+    0 1px 0 rgba(255,255,255,.35),
+    1px 0 0 rgba(255,255,255,.25),
+    -1px 0 0 rgba(255,255,255,.25);
   transform: translate(-50%, -50%);
-  opacity: .88;
+  opacity: .42;
 }
-.area-label.district { font-size: 15px; color: #2c4a58; }
-.area-label.local { font-size: 12px; letter-spacing: .18em; color: #3d5c4a; }
+.area-label.district { font-size: 22px; color: #2c4a58; opacity: .38; letter-spacing: .16em; }
+.area-label.local { font-size: 16px; letter-spacing: .2em; color: #3d5c4a; opacity: .46; }
 /* #panel / #panel-body 布局改由 SidePanel.vue / PanelBody.vue 负责（PC 侧栏 + H5 底栏） */
 .legend { display: flex; flex-wrap: wrap; gap: 8px 12px; margin: 4px 0 8px; font-size: 12px; color: var(--muted); }
 .legend span { display: inline-flex; align-items: center; gap: 5px; }
@@ -138,7 +143,50 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
 #map .maplibregl-ctrl-attrib, #map .maplibregl-ctrl-logo { display: none; }
 #map .maplibregl-canvas, #map .maplibregl-map { pointer-events: none; }
 .tile-banner strong { color: #3d2a0a; }
-#list { display: flex; flex-direction: column; gap: 4px; }
+#list { display: flex; flex-direction: column; gap: 8px; }
+/* 按类型手风琴 */
+.list-acc {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+.list-acc > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px;
+  font-weight: 700;
+  font-size: 13px;
+  user-select: none;
+  background: #f7f3ea;
+}
+.list-acc > summary::-webkit-details-marker { display: none; }
+.list-acc > summary::after {
+  content: "▾";
+  margin-left: auto;
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 12px;
+}
+.list-acc:not([open]) > summary::after { content: "▸"; }
+.list-acc .acc-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  background: #efe8db;
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+.list-acc-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 4px 6px;
+  border-top: 1px solid var(--line);
+}
 .item {
   display: grid; grid-template-columns: 10px 1fr; gap: 8px; align-items: start;
   padding: 7px 8px; border-radius: 8px; cursor: pointer; border: 1px solid transparent;
@@ -147,6 +195,7 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
 .item .name { font-weight: 650; font-size: 13px; }
 .item .meta { font-size: 11px; color: var(--muted); }
 .dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; background: currentColor; }
+.list-acc > summary .dot { margin-top: 0; }
 .badge {
   display: inline-block; font-size: 10px; font-weight: 650; padding: 0 5px;
   border-radius: 4px; margin-left: 4px; vertical-align: 1px;
@@ -154,14 +203,60 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
 .badge.exact { background: #dceee8; color: #1d5c45; }
 .badge.ref { background: #f3ead0; color: #6a5310; }
 .badge.cand { background: #e8dff3; color: #55307a; }
+/* 地点详情：PC 地图右上悬浮卡；H5 贴底栏上方 */
 #detail {
-  display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line);
+  display: none;
+  box-sizing: border-box;
 }
-#detail.open { display: block; }
-#detail h2 { margin: 0 0 6px; font-size: 16px; }
+#map #detail.open {
+  display: block;
+  position: absolute;
+  top: 10px;
+  right: 118px; /* 让出右侧底图切换 + 缩放条 */
+  z-index: 1100;
+  width: min(360px, calc(100% - 140px));
+  max-height: min(70vh, 560px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 14px 14px;
+  background: rgba(255, 253, 248, 0.96);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  pointer-events: auto;
+}
+#detail .detail-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 6px;
+}
+#detail h2 {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  font-size: 16px;
+  line-height: 1.35;
+}
+#detail .detail-close {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  margin: -4px -6px 0 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+#detail .detail-close:hover { background: #efe8db; color: var(--ink); }
 #detail p { margin: 0 0 8px; font-size: 13px; }
 #detail .src { font-size: 11px; color: var(--muted); word-break: break-all; }
 #detail a { color: var(--accent); }
+#detail .meta { font-size: 12px; color: var(--muted); }
 .links { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
 .links a {
   font-size: 12px; color: var(--accent); text-decoration: none;
@@ -174,10 +269,22 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
   background: rgba(255,255,255,.86) !important;
 }
 .leaflet-bar a { width: 30px; height: 30px; line-height: 30px; }
-/* keep default markers unused but harmless */
+/* 旧默认 marker tip 隐藏；地点名关闭时的悬浮 tip 用 qd-hover-tip */
 .qd-tooltip { display: none; }
+.leaflet-tooltip.qd-hover-tip {
+  background: rgba(255, 253, 248, 0.94);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  font: 650 12px/1.25 var(--font);
+  padding: 5px 8px;
+  white-space: nowrap;
+}
+.leaflet-tooltip.qd-hover-tip::before { border-top-color: var(--line); }
 
-/* 底图切换：默认藏在 #main；引擎挪进 #map 后显示（PC/H5 同位置） */
+/* 底图切换：默认藏在 #main；引擎挪进 #map 后显示
+   top/right 与左边距一致（10px）；缩放控件叠在其正下方 */
 #basemap-switch {
   display: none;
 }
@@ -186,7 +293,7 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
   flex-direction: column;
   gap: 6px;
   position: absolute;
-  top: 80px;
+  top: 10px;
   right: 10px;
   z-index: 1000;
   margin: 0;
@@ -199,6 +306,17 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
 #map #basemap-switch .el-button {
   margin: 0;
   min-width: 88px;
+}
+/* Leaflet 右上角缩放：紧挨底图切换下方，右对齐 */
+#map .leaflet-top.leaflet-right {
+  top: 96px;
+  right: 10px;
+}
+#map .leaflet-top.leaflet-right .leaflet-control {
+  margin-top: 0;
+  margin-right: 0;
+  float: right;
+  clear: right;
 }
 
 /* —— 窄屏：地图铺满 #main；SidePanel.vue 负责底部抽屉 —— */
@@ -217,7 +335,7 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
   /* 版权抬到收起握把上方 */
   .leaflet-bottom { bottom: calc(48px + var(--safe-b)); }
   #map #basemap-switch {
-    top: 72px;
+    top: 10px;
     right: 8px;
     padding: 4px;
   }
@@ -225,10 +343,25 @@ header .sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflo
     min-width: 76px;
     padding: 6px 8px;
   }
+  #map .leaflet-top.leaflet-right {
+    top: 88px;
+    right: 8px;
+  }
+  /* H5：详情卡贴在底部握把上方，避免挡控件 */
+  #map #detail.open {
+    top: auto;
+    right: 8px;
+    left: 8px;
+    bottom: calc(52px + var(--safe-b));
+    width: auto;
+    max-height: 38vh;
+  }
 }
 @media (max-width: 360px) {
   header h1 { font-size: 13px; }
   .place-label { font-size: 10px; max-width: 120px; }
+  .area-label.district { font-size: 18px; }
+  .area-label.local { font-size: 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }

@@ -23,6 +23,8 @@ provide('openSidePanel', () => sidePanelRef.value?.openPanel?.())
     <BasemapSwitch />
     <div id="coverage-note">虚线框内为已加载的离线陆海；框外是未加载范围，不是海。</div>
     <TileBanner />
+    <!-- PC：引擎会把本节点挪进 #map，做成右上角悬浮详情卡；H5 贴在底栏上方 -->
+    <div id="detail" class="detail-card" aria-live="polite" />
     <SidePanel ref="sidePanelRef" />
   </div>
 </template>
