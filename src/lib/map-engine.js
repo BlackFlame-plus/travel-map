@@ -718,8 +718,13 @@ if (typeof window !== "undefined") {
     var pad = 4;
     var padBottom = pad;
     if (isMobile()) {
-      var sheet = $("panel");
-      padBottom = ((sheet && !sheet.classList.contains("collapsed")) ? sheet.offsetHeight : 48) + 8;
+      /* H5：展开时是 el-drawer；收起时只有底部按钮 */
+      var drawer = document.querySelector(".h5-place-drawer.el-drawer");
+      if (state.panelOpen && drawer) {
+        padBottom = (drawer.offsetHeight || Math.round(window.innerHeight * 0.58)) + 8;
+      } else {
+        padBottom = 64 + 8;
+      }
     }
 
     function overlaps(b) {

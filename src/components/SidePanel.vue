@@ -1,10 +1,10 @@
 <script setup lang="ts">
 /**
  * PC：右侧常驻栏
- * H5：底部抽屉式面板（收起只留握把；展开约半屏）
+ * H5：底部 el-drawer（Element Plus）+ 收起时底部悬浮按钮
  *
- * 不用 el-drawer 的原因：关闭时内容可能未挂载，#list/#detail 会被引擎写丢。
- * 这里用同一套 DOM + v-show，保证清单节点始终存在；控件仍全部用 Element Plus。
+ * PC / H5 互斥挂载，保证 PanelBody（#list）同一时间只有一份。
+ * 抽屉 destroy-on-close=false，打开过后清单 DOM 会保留。
  */
 import { nextTick, ref, watch } from 'vue'
 import { ArrowDown, ArrowUp } from '@element-plus/icons-vue'
@@ -13,26 +13,25 @@ import { useIsMobile } from '../composables/useBreakpoint'
 import { getMapApi } from '../lib/map-bridge.js'
 
 const { isMobile } = useIsMobile()
-const panelOpen = ref(true)
+/** 仅 H5 使用；PC 始终可视 */
+const panelOpen = ref(false)
 
 function notifyEngine() {
   const open = !isMobile.value || panelOpen.value
   getMapApi()?.setPanelOpen?.(open)
 }
 
-function togglePanel() {
-  if (!isMobile.value) return
-  panelOpen.value = !panelOpen.value
-}
-
 function openPanel() {
   panelOpen.value = true
+}
+
+function closePanel() {
+  panelOpen.value = false
 }
 
 watch(
   isMobile,
   (mobile) => {
-    // H5 默认收起，避免挡住地图；PC 始终展开
     panelOpen.value = !mobile
     nextTick(() => {
       notifyEngine()
@@ -42,63 +41,86 @@ watch(
   { immediate: true },
 )
 
-watch(panelOpen, () => {
-  nextTick(notifyEngine)
+watch(panelOpen, (open) => {
+  nextTick(() => {
+    notifyEngine()
+    if (open) getMapApi()?.refreshUi?.()
+  })
 })
 
-defineExpose({ openPanel, panelOpen })
+defineExpose({ openPanel, closePanel, panelOpen })
 </script>
 
 <template>
+  <!-- ===== PC：右侧固定栏 ===== -->
   <aside
+    v-if="!isMobile"
     id="panel"
-    class="side-panel"
-    :class="{
-      'is-h5': isMobile,
-      collapsed: isMobile && !panelOpen,
-    }"
+    class="pc-panel"
     aria-label="地点与说明"
   >
-    <!-- H5 握把 / 标题条：展开与收起都显示 -->
-    <button
-      v-if="isMobile"
-      type="button"
-      id="panel-grip"
-      class="h5-grip"
-      :aria-expanded="panelOpen ? 'true' : 'false'"
-      @click="togglePanel"
-    >
-      地点与说明
-      <el-icon class="chev">
-        <ArrowDown v-if="panelOpen" />
-        <ArrowUp v-else />
-      </el-icon>
-      <span class="grip-action">{{ panelOpen ? '收起' : '展开' }}</span>
-    </button>
-
-    <div v-else class="pc-panel-title">地点与说明</div>
-
-    <!-- v-show：收起时仍保留 DOM，引擎可继续写 #list -->
-    <PanelBody v-show="!isMobile || panelOpen" />
+    <div class="pc-panel-title">地点与说明</div>
+    <PanelBody />
   </aside>
+
+  <!-- ===== H5：Element Plus 底部抽屉 ===== -->
+  <template v-else>
+    <div
+      v-show="!panelOpen"
+      class="h5-dock"
+      id="panel-grip"
+    >
+      <el-button
+        type="primary"
+        round
+        size="large"
+        class="h5-dock-btn"
+        aria-expanded="false"
+        @click="openPanel"
+      >
+        地点与说明
+        <el-icon class="el-icon--right"><ArrowUp /></el-icon>
+      </el-button>
+    </div>
+
+    <el-drawer
+      v-model="panelOpen"
+      class="h5-place-drawer"
+      direction="btt"
+      size="58%"
+      :with-header="true"
+      :show-close="false"
+      :append-to-body="true"
+      :destroy-on-close="false"
+      :close-on-click-modal="true"
+      :z-index="3000"
+      modal-class="h5-place-drawer-modal"
+    >
+      <template #header>
+        <div class="h5-drawer-head">
+          <span class="h5-drawer-title">地点与说明</span>
+          <el-button text type="primary" @click="closePanel">
+            收起
+            <el-icon class="el-icon--right"><ArrowDown /></el-icon>
+          </el-button>
+        </div>
+      </template>
+      <PanelBody />
+    </el-drawer>
+  </template>
 </template>
 
 <style scoped>
-.side-panel {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  background: var(--panel, #fffdf8);
-  z-index: 30;
-  pointer-events: auto;
-}
-
-/* —— PC —— */
-.side-panel:not(.is-h5) {
+.pc-panel {
   flex: 0 0 340px;
   width: 340px;
   max-width: 100%;
+  background: var(--panel, #fffdf8);
   border-left: 1px solid var(--line, #d8d0c4);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  z-index: 30;
   box-shadow: -6px 0 20px rgba(28, 42, 46, 0.06);
 }
 .pc-panel-title {
@@ -109,50 +131,55 @@ defineExpose({ openPanel, panelOpen })
   border-bottom: 1px solid var(--line, #d8d0c4);
 }
 
-/* —— H5：贴底抽屉 —— */
-.side-panel.is-h5 {
+.h5-dock {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  width: 100%;
-  max-height: 52vh;
-  border-left: 0;
-  border-top: 1px solid var(--line, #d8d0c4);
-  border-radius: 14px 14px 0 0;
-  box-shadow: 0 -8px 24px rgba(28, 42, 46, 0.14);
-  z-index: 2000;
+  z-index: 2001;
+  display: flex;
+  justify-content: center;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+  pointer-events: none;
 }
-.side-panel.is-h5.collapsed {
-  max-height: calc(44px + env(safe-area-inset-bottom, 0px));
-  overflow: hidden;
+.h5-dock-btn {
+  pointer-events: auto;
+  min-width: 168px;
+  box-shadow: 0 8px 24px rgba(28, 42, 46, 0.18);
 }
-.h5-grip {
-  flex: 0 0 auto;
-  min-height: 44px;
-  padding: 0 12px;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+
+.h5-drawer-head {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
+  justify-content: space-between;
   width: 100%;
-  border: 0;
+  gap: 8px;
+}
+.h5-drawer-title {
+  font-weight: 700;
+  font-size: 15px;
+}
+</style>
+
+<style>
+/* drawer 挂到 body，需全局样式 */
+.h5-place-drawer.el-drawer {
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
   background: var(--panel, #fffdf8);
-  color: var(--ink, #1c2a2e);
-  font: inherit;
-  font-weight: 650;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
 }
-.grip-action {
-  margin-left: 4px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--muted, #5a686c);
+.h5-place-drawer .el-drawer__header {
+  margin-bottom: 0;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line, #d8d0c4);
 }
-.chev {
-  font-size: 14px;
-  color: var(--muted, #5a686c);
+.h5-place-drawer .el-drawer__body {
+  padding: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--panel, #fffdf8);
+}
+.h5-place-drawer-modal {
+  background: rgba(28, 42, 46, 0.28) !important;
 }
 </style>
